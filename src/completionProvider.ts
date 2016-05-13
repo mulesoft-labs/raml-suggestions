@@ -344,6 +344,11 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
             if (node.isAttr() || node.isImplicit()) {
                 throw new Error("Should be highlevel node at this place")
             }
+
+            if (search.isExampleNode(hlnode)) {
+                return examplePropertyCompletion(hlnode, request);
+            }
+            
             if (hlnode.property()
                 && universeHelpers.isUriParametersProperty(hlnode.property())
                 && hlnode.definition() instanceof def.NodeClass) {
@@ -1455,6 +1460,20 @@ function nodeToProposalInfo(x: parserApi.hl.IHighLevelNode, c: parserApi.hl.IHig
         extra:extra,
         isResourceType: isResourceType
     }
+}
+
+function examplePropertyCompletion(node, request:CompletionRequest) {
+    if (!search.isExampleNode(node)) {
+        return [];
+    }
+
+    var contentType = search.findExampleContentType(node);
+    if (!contentType) return [];
+
+    var parsedExample = search.parseStructuredExample(node, contentType);
+    if (!parsedExample) return [];
+
+    return getSuggestions(request, findASTNodeByOffset(parsedExample, request))
 }
 
 export function postProcess(providerSuggestions: any, request: CompletionRequest) {
