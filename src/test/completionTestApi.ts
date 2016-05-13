@@ -82,16 +82,17 @@ export function completionByOffset(filePath: string, offset: number): string {
 
     var result = completionProvider.suggest(new completion.CompletionRequest(content, position), true);
 
-    return result.map((suggestion: any) => suggestion.text).join(', ');
+    return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
 }
 
-export function completionByUniqueEntry(filePath: string, entry: string): string {
+export function completionByUniqueEntry(filePath: string, entry: string, begin: boolean = false): string {
     var completionProvider: CompletionProvider = new CompletionProvider(new ContentProvider());
 
     var content: completion.IContent = new FSContent(resolve(filePath));
-    var position: completion.IPosition = new Position(offsetForEntry(entry, content.getText()));
+
+    var position: completion.IPosition = new Position(begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText()));
 
     var result = completionProvider.suggest(new completion.CompletionRequest(content, position), true);
 
-    return result.map((suggestion: any) => suggestion.text).join(', ');
+    return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
 }
