@@ -5,6 +5,10 @@
   "scripts": {
     "build": "rimraf dist && tsc"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dreamflyer/raml-suggestions.git"
+  }
   "typings": "./dist/index.d.ts",
   "dependencies": {
     "underscore": "^1.8.3",
