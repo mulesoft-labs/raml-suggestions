@@ -1,9 +1,10 @@
 {
   "name": "raml-suggestions",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rimraf dist && tsc"
+    "build": "rimraf dist && tsc",
+    "test-cov": " ./node_modules/.bin/istanbul cover _mocha dist/test/*Tests.js"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,11 @@
     "fuzzaldrin-plus": "^0.3.1"
   },
   "devDependencies": {
-    "rimraf": "*",
-    "typescript": "1.8.7"
+    "chai": "^2.2.0",
+    "chai-as-promised": "^5.2.0",
+    "mocha": "^2.2.1",
+    "istanbul": "^0.4.2",
+    "typescript": "1.8.7",
+    "rimraf": "*"
   }
 }

@@ -66,15 +66,32 @@ class Position implements completion.IPosition {
     }
 }
 
-export function testCompletion(filePath: string, offset: number, expected: string[]) {
+function offsetForEntry(entry: string, text: string): number {
+    return text.indexOf(entry) + entry.length;
+}
+
+function resolve(testPath: string): string {
+    return path.resolve(__dirname, '../../tests/' + testPath);
+}
+
+export function completionByOffset(filePath: string, offset: number): string {
     var completionProvider: CompletionProvider = new CompletionProvider(new ContentProvider());
 
-    var content: completion.IContent = new FSContent(filePath);
+    var content: completion.IContent = new FSContent(resolve(filePath));
     var position: completion.IPosition = new Position(offset);
 
     var result = completionProvider.suggest(new completion.CompletionRequest(content, position), true);
 
-    console.log(JSON.stringify(result, null, '\t'));
+    return result.map((suggestion: any) => suggestion.text).join(', ');
 }
 
-testCompletion('/Users/dreamflyer/newRamlProject/api.raml', 1018, []);
+export function completionByUniqueEntry(filePath: string, entry: string): string {
+    var completionProvider: CompletionProvider = new CompletionProvider(new ContentProvider());
+
+    var content: completion.IContent = new FSContent(resolve(filePath));
+    var position: completion.IPosition = new Position(offsetForEntry(entry, content.getText()));
+
+    var result = completionProvider.suggest(new completion.CompletionRequest(content, position), true);
+
+    return result.map((suggestion: any) => suggestion.text).join(', ');
+}
