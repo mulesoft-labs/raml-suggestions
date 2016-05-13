@@ -346,7 +346,7 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
             }
 
             if (search.isExampleNode(hlnode)) {
-                return examplePropertyCompletion(hlnode, request);
+                return examplePropertyCompletion(hlnode, request, provider);
             }
             
             if (hlnode.property()
@@ -1462,7 +1462,7 @@ function nodeToProposalInfo(x: parserApi.hl.IHighLevelNode, c: parserApi.hl.IHig
     }
 }
 
-function examplePropertyCompletion(node, request:CompletionRequest) {
+function examplePropertyCompletion(node: any, request:CompletionRequest, provider: CompletionProvider) {
     if (!search.isExampleNode(node)) {
         return [];
     }
@@ -1473,7 +1473,7 @@ function examplePropertyCompletion(node, request:CompletionRequest) {
     var parsedExample = search.parseStructuredExample(node, contentType);
     if (!parsedExample) return [];
 
-    return getSuggestions(request, findASTNodeByOffset(parsedExample, request))
+    return getSuggestions(request, provider, findASTNodeByOffset(parsedExample, request))
 }
 
 export function postProcess(providerSuggestions: any, request: CompletionRequest) {
