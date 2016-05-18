@@ -35,19 +35,55 @@ describe("Basic completion tests", function() {
     });
 
     it("User-defined types reference completion for a type shortcut definition", function () {
-        testCompletionByEntryEnd('basic/test7.raml', '\n  TestType1: Tes', 'TestType, TestTypeUnion, TestType2, TestTypePrimitive');
+        testCompletionByEntryEnd('basic/test7.raml', '\n  TestType1: Tes', 'TestType, TestTypeUnion, TestTypePrimitive, TestType2, TestTypeWithInheritance');
     });
 
     it("User-defined types reference completion for a type definition", function () {
-        testCompletionByEntryEnd('basic/test7.raml', '\n    type: Tes', 'TestType, TestType1, TestTypeUnion, TestTypePrimitive');
+        testCompletionByEntryEnd('basic/test7.raml', '\n    type: Tes', 'TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance');
     });
 
     it("User-defined types reference completion for a property shortcut definition", function () {
-        testCompletionByEntryEnd('basic/test7.raml', '\n      property: Tes', 'TestType, TestTypeUnion, TestType1, TestTypePrimitive, TestType2');
+        testCompletionByEntryEnd('basic/test7.raml', '\n      property: Tes', 'TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2');
     });
 
     it("User-defined types reference completion for a property definition", function () {
-        testCompletionByEntryEnd('basic/test7.raml', '\n        type: Tes', 'TestType, TestTypeUnion, TestType1, TestTypePrimitive, TestType2');
+        testCompletionByEntryEnd('basic/test7.raml', '\n        type: Tes', 'TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestType2, TestTypeWithInheritance');
+    });
+
+    it("User-defined types reference completion for a object union type shortcut definition", function () {
+        testCompletionByEntryEnd('basic/test8.raml', '\n  TestType1: TestTypePrimitive | Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType2, TestTypeWithInheritance');
+    });
+
+    it("User-defined types reference completion for a object union type definition", function () {
+        testCompletionByEntryEnd('basic/test9.raml', '\n    type: TestTypeUnion | Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType2, TestTypeWithInheritance');
+    });
+
+    it("User-defined types reference completion for a property union type shortcut definition", function () {
+        testCompletionByEntryEnd('basic/test9.raml', '\n      property: TestTypeUnion | Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2');
+    });
+
+    it("User-defined types reference completion for a property union type definition", function () {
+        testCompletionByEntryEnd('basic/test9.raml', '\n        type: TestTypeUnion | Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2');
+    });
+
+    //this comletion does not work in the api-workbench rc2
+    it("User-defined types reference completion for a object type shortcut inheritance definition", function () {
+        testCompletionByEntryEnd('basic/test10.raml', '\n  TestType1: [PartTwo, Tes', 'TestTypeObject, TestType, TestTypeWithInheritance, TestType2');
+    });
+
+    //this completion does not contains `TestType2` bug #2609
+    it("User-defined types reference completion for a object type inheritance definition", function () {
+        testCompletionByEntryEnd('basic/test10.raml', '\n    type: [PartOne, Tes', 'TestTypeObject, TestType3, TestType, TestTypeWithInheritance');
+    });
+
+    //this test contains impossible suggestions
+    it("User-defined types reference completion for a property shortcut inheritance definition", function () {
+        testCompletionByEntryEnd('basic/test10.raml', '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
+    });
+
+    //this test contains impossible suggestions
+    it("User-defined types reference completion for a property inheritance definition", function () {
+        testCompletionByEntryEnd('basic/test10.raml', '\n        type: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
     });
 });
 

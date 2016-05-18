@@ -25,6 +25,10 @@ types:
     type: object
     properties:
       count: integer
-  TestType1: TestTypePrimitive | TestTypeUnion
+  TestType1: [PartTwo, TestType]
   TestType2:
-    type: TestTypeUnion | TestTypePrimitive 
+    type: [PartOne, TestType]
+  TestType3:
+    type: object
+    properties:
+      property: [PartOne, TestType]
