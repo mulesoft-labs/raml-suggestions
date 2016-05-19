@@ -1,7 +1,5 @@
 #%RAML 1.0
-title: Some Api
-version: v1
-baseUri: https://example.com/
+title: test
 types:
   TestTypeObject:
     type: object
@@ -34,3 +32,20 @@ types:
       property: [PartOne, TestType]
       propertyTwo:
         type: [PartOne, TestType]
+resourceTypes:
+  TestResorceType:
+    post:
+      description: Allows to create new <<objectName | !singularize>>
+      body:
+        application/json:
+          type: <<objectName | !singularize>>
+  TestResorceTypeTwo:
+    post:
+      description: Allows to create new <<objectName | !singularize>>
+      body:
+        application/json:
+          type: <<objectName | !singularize>>
+/test:
+  type: Te
+  /child:
+    type:  { TestResorceTypeTwo: {objectName : TestType} }
