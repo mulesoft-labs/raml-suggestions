@@ -50,7 +50,7 @@ export class CompletionRequest {
             return this.prefixValue;
         }
 
-        return this.valuePrefix();
+        return completionProvider.getPrefix(this);
     }
 
     setPrefix(value: string): void {

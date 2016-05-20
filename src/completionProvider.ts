@@ -1477,6 +1477,26 @@ function examplePropertyCompletion(node: any, request:CompletionRequest, provide
 }
 
 export function postProcess(providerSuggestions: any, request: CompletionRequest) {
+    var prepared: any[] = postProcess1(providerSuggestions, request);
+
+    var added: string[] = [];
+
+    var result: any[] = [];
+
+    prepared.forEach(item => {
+        var value = suggestionValue(item);
+
+        if(added.indexOf(value) < 0) {
+            result.push(item);
+
+            added.push(value);
+        }
+    });
+
+    return result;
+}
+
+function postProcess1(providerSuggestions: any, request: CompletionRequest) {
     var hasDeprecations: any, hasEmpty: any, suggestion: any, _i: any, _len: any;
     if (providerSuggestions == null) {
         return;
@@ -1574,12 +1594,33 @@ function getDefaultReplacementPrefix(prefix: any) {
     }
 };
 
+function suggestionValue(suggestion: any): string {
+    return (suggestion && (suggestion.displayText || suggestion.text)) || null;
+}
+
 var prefixRegex = /(\b|['"~`!@#\$%^&*\(\)\{\}\[\]=\+,\/\?>])((\w+[\w-]*)|([.:;[{(< ]+))$/;
 
-// function getPrefix(editor, bufferPosition) {
-//     var line, _ref1;
-//
-//     line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition]);
-//
-//     return ((_ref1 = prefixRegex.exec(line)) != null ? _ref1[2] : void 0) || '';
-// };
+export function getPrefix(request: CompletionRequest): string {
+    var line: string, _ref1: any;
+
+    line = getLine(request);
+
+    return ((_ref1 = prefixRegex.exec(line)) != null ? _ref1[2] : void 0) || '';
+}
+
+function getLine(request: CompletionRequest): string {
+    var offset: number = request.position.getOffset();
+
+    var text: string = request.content.getText();
+
+    for(var i = offset - 1; i >= 0; i--) {
+        var c = text.charAt(i);
+
+        if(c === '\r' || c === '\n' || c=== ' ' || c=== '\t') {
+            return text.substring(i+1,offset);
+        }
+
+    }
+
+    return "";
+}
