@@ -92,3 +92,23 @@ export class CompletionProvider {
         return doPostProcess ? completionProvider.postProcess(suggestions, request) : suggestions;
     }
 }
+
+export interface FSResolver {
+    content(path:string): string;
+    
+    list(path: string): string[];
+
+    exists(path: string): boolean;
+
+    contentAsync(path:string):Promise<string>;
+    
+    dirname(path: string): string;
+
+    resolve(contextPath: string, relativePath: string): string;
+    
+    extname(path: string): string;
+}
+
+export function getContentPovider(resolver: FSResolver): ICompletionContentProvider {
+    return completionProvider.getContentPovider(resolver);
+}

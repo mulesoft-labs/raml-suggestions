@@ -12,6 +12,8 @@ import services = def;
 import _ = require("underscore");
 
 import {ICompletionContentProvider} from "./index";
+import {IContent} from "./index";
+import {FSResolver} from "./index";
 import {CompletionProvider} from "./index";
 import {CompletionRequest} from "./index";
 import {Suggestion} from "./index";
@@ -493,7 +495,7 @@ function completionKind(request: CompletionRequest) {
 function getAstNode(request: CompletionRequest, contentProvider: ICompletionContentProvider, clearLastChar: boolean = true, allowNull: boolean = true): parserApi.hl.IParseResult {
     var newProjectId: string = contentProvider.contentDirName(request.content);
 
-    var project: any = parserApi.project.createProject(newProjectId);
+    var project: any = parserApi.project.createProject(newProjectId, <FSResolver>(<any>contentProvider).fsResolver);
 
     var offset = request.position.getOffset();
 
@@ -1623,4 +1625,40 @@ function getLine(request: CompletionRequest): string {
     }
 
     return "";
+}
+
+class ResolvedProvider implements ICompletionContentProvider {
+    fsResolver: FSResolver;
+    
+    constructor(private resolver: FSResolver) {
+        this.fsResolver = resolver;
+    }
+
+    contentDirName(content: IContent): string {
+        return this.resolver.dirname(content.getPath());
+    }
+
+    dirName(path: string): string {
+        return this.resolver.dirname(path);
+    }
+
+    exists(path: string): boolean {
+        return this.resolver.exists(path);
+    }
+
+    resolve(contextPath: string, relativePath: string): string {
+        return this.resolver.resolve(contextPath, relativePath);
+    }
+
+    isDirectory(path: string): boolean {
+        return this.resolver.exists && this.resolver.extname(path) ? true : false;
+    }
+
+    readDir(path: string): string[] {
+        return this.resolver.list(path);
+    }
+}
+
+export function getContentPovider(resolver: FSResolver): ICompletionContentProvider {
+    return new ResolvedProvider(resolver);
 }
