@@ -107,6 +107,8 @@ export interface FSResolver {
     resolve(contextPath: string, relativePath: string): string;
     
     extname(path: string): string;
+    
+    isDirectory(path: string): boolean;
 }
 
 export function getContentPovider(resolver: FSResolver): ICompletionContentProvider {

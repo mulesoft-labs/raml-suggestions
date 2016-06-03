@@ -1651,7 +1651,7 @@ class ResolvedProvider implements ICompletionContentProvider {
     }
 
     isDirectory(path: string): boolean {
-        return this.resolver.exists && this.resolver.extname(path) ? true : false;
+        return this.resolver.isDirectory(path);
     }
 
     readDir(path: string): string[] {
