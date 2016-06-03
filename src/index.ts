@@ -111,6 +111,6 @@ export interface FSResolver {
     isDirectory(path: string): boolean;
 }
 
-export function getContentPovider(resolver: FSResolver): ICompletionContentProvider {
-    return completionProvider.getContentPovider(resolver);
+export function getContentProvider(resolver: FSResolver): ICompletionContentProvider {
+    return completionProvider.getContentProvider(resolver);
 }

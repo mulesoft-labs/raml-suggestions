@@ -1659,6 +1659,6 @@ class ResolvedProvider implements ICompletionContentProvider {
     }
 }
 
-export function getContentPovider(resolver: FSResolver): ICompletionContentProvider {
+export function getContentProvider(resolver: FSResolver): ICompletionContentProvider {
     return new ResolvedProvider(resolver);
 }
