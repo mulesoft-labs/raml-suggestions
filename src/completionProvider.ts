@@ -665,7 +665,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IComplet
     }
 
     if(!known || !custom) {
-        if(contentProvider.exists(dn)) {
+        if(contentProvider.exists(dn) && contentProvider.isDirectory(dn)) {
             var dirContent = contentProvider.readDir(dn);
             res = res.concat(dirContent.map(x=> {
                 return {text: x}
