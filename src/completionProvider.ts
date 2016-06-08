@@ -995,6 +995,11 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
             rs = addDefineInlineProposal2(rs,hlnode.lowLevel().start(),text);
             return rs;
         }
+        if (universeHelpers.isExampleSpecType(hlnode.definition())){
+            console.log('Buzzinga!!!');
+
+            return examplePropertyCompletion(hlnode, request, provider);
+        }
     }
 }
 
@@ -1197,6 +1202,16 @@ function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IH
                         text: value
                     };
                 });
+            }
+            
+            var propertyNode = (<any>property).node && (<any>property).node();
+
+            if(propertyNode) {
+                var suggestions: any[] = _.filter(propertyNode.children(), (child: any) => {
+                    return child.name && child.value && child.property() && universeHelpers.isEnumProperty(child.property());
+                }).map((child: any) => ({text: (<any>child).value()}));
+                
+                return suggestions;
             }
         }
     }
