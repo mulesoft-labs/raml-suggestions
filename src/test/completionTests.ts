@@ -89,6 +89,14 @@ describe("Basic completion tests", function() {
         testCompletionByEntryEnd('basic/test10.raml', '\n        type: [PartOne, Tes', 'TestTypeObject, TestType2, TestType3, TestTypeWithInheritance');
     });
 
+    it("Using Discriminator. BUG#1820 FIXME", function () {
+        //testCompletionByEntryEnd('basic/test24.raml', '\n    discriminator: k', 'kind');
+    });
+
+    it("User-defined Facets.", function () {
+        testCompletionByEntryEnd('basic/test25.raml', '\n    no', 'noHolidays, notOnlyFutureDates');
+    });
+
     it("Resource types reference completion", function () {
         testCompletionByEntryEnd('basic/test11.raml', '\n  type: ', 'resourceTypeType, resourceTypeAnother');
     });
@@ -112,9 +120,24 @@ describe("Basic completion tests", function() {
         testCompletionByEntryEnd('basic/test13.raml', '\n    type:  { TestResorceTypeTwo: {objectName : Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
     });
 
-    //bug #2614
-    it("Resource type parameters schema reference completion. BUG#2614 SWITCHED OFF. FIXME", function () {
-    //    testCompletionByEntryEnd('basic/test14.raml', '\n  type:  { TestResorceType: {objectName : Tes', 'TestSchema');
+    it("Resource type parameters schema reference completion.", function () {
+        testCompletionByEntryEnd('basic/test14.raml', '\n  type:  { TestResorceType: {objectName : Tes', 'TestSchema');
+    });
+
+    it("Resource type parameters function singularize", function () {
+        testCompletionByEntryEnd('basic/test28.raml', '\n            type: <<resourcePathName | !singu', 'singularize');
+    });
+
+    it("Resource type parameters function pluralize", function () {
+        testCompletionByEntryEnd('basic/test28.raml', '\n            type: <<resourcePathName | !pl', 'pluralize');
+    });
+
+    it("Resource type parameters functions: uppercase, uppercamelcase, upperhyphencase, upperunderscorecase", function () {
+        testCompletionByEntryEnd('basic/test28.raml', '\n            type: <<resourcePathName | !upp', 'uppercase, uppercamelcase, upperhyphencase, upperunderscorecase');
+    });
+
+    it("Resource type parameters functions: lowercase, lowercamelcase, lowerhyphencase, lowerunderscorecase", function () {
+        testCompletionByEntryEnd('basic/test28.raml', '\n            type: <<resourcePathName | !low', 'lowercase, lowercamelcase, lowerhyphencase, lowerunderscorecase');
     });
 
     it("Trait parameters reference completion", function () {
@@ -139,6 +162,10 @@ describe("Basic completion tests", function() {
 
     it("Example completion", function () {
         testCompletionByEntryEnd('basic/test18.raml', '\n      k', 'kind');
+    });
+
+    it("Multiple Examples Properties", function () {
+        testCompletionByEntryEnd('basic/test26.raml', '\n        des', 'description');
     });
 
     it("minLength facet completion", function () {
@@ -179,6 +206,382 @@ describe("Basic completion tests", function() {
 
     it("pattern facet completion", function () {
         testCompletionByEntryEnd('basic/test19.raml', '\n        patte', 'pattern');
+    });
+
+    it("Root nodes: types, traits, title", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nt', 'types, traits, title');
+    });
+
+    it("Root nodes: description, documentation", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nd', 'description, documentation');
+    });
+
+    it("Root node: version", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nv', 'version');
+    });
+
+    it("Root nodes: baseUri, baseUriParameters", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nb', 'baseUri, baseUriParameters');
+    });
+
+    it("Root node: protocols", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\np', 'protocols');
+    });
+
+    it("Root node: mediaType", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nm', 'mediaType');
+    });
+
+    it("Root nodes: schemas, securitySchemes, securedBy", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\ns', 'schemas, securitySchemes, securedBy');
+    });
+
+    it("Root node: resourceTypes", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nr', 'resourceTypes');
+    });
+
+    it("Root node: annotationTypes", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\na', 'annotationTypes');
+    });
+
+    it("Root node: uses", function () {
+        testCompletionByEntryEnd('basic/test20.raml', '\nu', 'uses');
+    });
+
+    it("Base URI parameter used in the baseUri node", function () {
+        testCompletionByEntryEnd('basic/test21.raml', '\n  b', 'bucketName: \n    ');
+    });
+
+    it("URI parameter used in the resource path", function () {
+        testCompletionByEntryEnd('basic/test21.raml', '\n    se', 'serverId: \n      , serviceId: \n      ');
+    });
+
+    it("Allowed protocols: ", function () {
+        testCompletionByEntryEnd('basic/test21.raml', '\nprotocols: H', 'HTTP, HTTPS');
+    });
+
+    it("Default Media Types", function () {
+        testCompletionByEntryEnd('basic/test22.raml', '\nmediaType: ', 'application/json, application/xml, application/x-www-form-urlencoded, multipart/form-data');
+    });
+
+    it("Several Default Media Types", function () {
+        testCompletionByEntryEnd('basic/test23.raml', '\nmediaType: [multipart/form-data, a', 'application/json, application/xml, application/x-www-form-urlencoded');
+    });
+
+    it("Request body media type 1", function () {
+        testCompletionByEntryEnd('basic/test24.raml', '\n      appl', 'application/xml, application/json, application/x-www-form-urlencoded');
+    });
+
+    it("Request body media type 2", function () {
+        testCompletionByEntryEnd('basic/test24.raml', '\n      mul', 'multipart/form-data');
+    });
+
+    it("Response body media type", function () {
+        testCompletionByEntryEnd('basic/test24.raml', '\n          app', 'application/json, application/xml');
+    });
+
+    it("Default Security", function () {
+        testCompletionByEntryEnd('basic/test23.raml', '\nsecuredBy: [ o', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Resource Security", function () {
+        testCompletionByEntryEnd('basic/test23.raml', '\n  securedBy: o', 'oauth_2_0, oauth_1_0');
+    });
+
+    //2613 Completion suggests already used trait items
+    it("Resource several Security BUG#2613 FIXME", function () {
+        //testCompletionByEntryEnd('basic/test23.raml', '\n  securedBy: [oauth_2_0, oa', 'oauth_1_0');
+        testCompletionByEntryEnd('basic/test23.raml', '\n  securedBy: [oauth_2_0, oa', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Resource node 'is:'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  i', 'is');
+    });
+
+    it("Resource node 'type:'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  t', 'type');
+    });
+
+    it("Resource nodes 'description, displayName, delete'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  d', 'description, displayName, delete');
+    });
+
+    it("Resource node 'get:'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  g', 'get');
+    });
+
+    it("Resource nodes 'put, post, patch'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  p', 'put, post, patch');
+    });
+
+    it("Resource node 'uriParameters'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  u', 'uriParameters');
+    });
+
+    it("Resource node 'options'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  o', 'options');
+    });
+
+    it("Resource node 'head'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  h', 'head');
+    });
+
+    it("Resource annotation", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n  (annot', 'annotaion');
+    });
+
+    it("Method Security", function () {
+        testCompletionByEntryEnd('basic/test23.raml', '\n    securedBy: o', 'oauth_2_0, oauth_1_0');
+    });
+
+    //2613 Completion suggests already used trait items
+    it("Method several Security  BUG#2613 FIXME", function () {
+        //testCompletionByEntryEnd('basic/test23.raml', '\n      securedBy: [oauth_2_0, o', 'oauth_1_0');
+        testCompletionByEntryEnd('basic/test23.raml', '\n      securedBy: [oauth_2_0, o', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Method nodes 'queryString, queryParameters'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    q', 'queryParameters, queryString');
+    });
+
+    it("Method request 'headers'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    h', 'headers');
+    });
+
+    it("Method request 'headers' items completion", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n      Las', 'Last-Modified, Last-Event-ID');
+    });
+
+    it("Method request 'body'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    b', 'body');
+    });
+
+    it("Method node 'responses'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    re', 'responses');
+    });
+
+    it("Method node 'protocols'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    pro', 'protocols');
+    });
+
+    it("Method node 'is'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    i', 'is');
+    });
+
+    it("Method node 'description, displayName'", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    d', 'description, displayName');
+    });
+
+    it("Method annotation", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n    (annot', 'annotaion');
+    });
+
+    it("Response codes", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n      1', '1xx, 100, 101, 102');
+    });
+
+    it("Response headers", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n        he', 'headers');
+    });
+
+    it("Method response 'headers' items completion", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n          Las', 'Last-Modified, Last-Event-ID');
+    });
+
+    it("Response body", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n        bo', 'body');
+    });
+
+    it("Response body mimeTypes", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n          app', 'application/json, application/xml');
+    });
+
+    it("Response description", function () {
+        testCompletionByEntryEnd('basic/test27.raml', '\n        des', 'description');
+    });
+
+    it("Security Scheme Declaration: type", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    ty', 'type');
+    });
+
+    it("Security Scheme Declaration: type value test 1", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    type: O', 'OAuth 2.0, OAuth 1.0');
+    });
+
+    it("Security Scheme Declaration: type value test 2", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    type: P', 'Pass Through');
+    });
+
+    it("Security Scheme Declaration: type value test 3", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    type: Ba', 'Basic Authentication');
+    });
+
+    it("Security Scheme Declaration: type value test 4", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    type: Dig', 'Digest Authentication');
+    });
+
+    it("Security Scheme Declaration: type value test 5", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    type: x', 'x-{other}');
+    });
+
+    it("Security Scheme Declaration: settings", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    sett', 'settings');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 settings nodes authorizationGrants, accessTokenUri, authorizationUri", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      au', 'authorizationGrants, accessTokenUri, authorizationUri');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 settings node scopes", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      sco', 'scopes');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 settings node authorizationGrants item authorization_code", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      authorizationGrants: [ au', 'authorization_code');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 settings node authorizationGrants item password", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      authorizationGrants: [ authorization_code, pas', 'password');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 settings node authorizationGrants item implicit", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      authorizationGrants: [ authorization_code, password, impl', 'implicit');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 settings node authorizationGrants item client_credentials", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      authorizationGrants: [ authorization_code, password, implicit, cli', 'client_credentials');
+    });
+
+    it("Security Scheme Declaration: description, describedBy", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n    descr', 'description, describedBy');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 describedBy node headers", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      hea', 'headers');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 describedBy node headers item", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n        X', 'X-Frame-Options');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 describedBy nodes querySring, queryParameters", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      quer', 'queryParameters, queryString');
+    });
+
+    it("Security Scheme Declaration: OAuth 2.0 describedBy node responses", function () {
+        testCompletionByEntryEnd('basic/test29.raml', '\n      respo', 'responses');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node requestTokenUri", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      req', 'requestTokenUri');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node authorizationUri", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      aut', 'authorizationUri');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node tokenCredentialsUri", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      tok', 'tokenCredentialsUri');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node signatures", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      sig', 'signatures');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node signatures item PLAINTEXT", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      signatures: [ PLAI', 'PLAINTEXT');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node signatures item HMAC-SHA1", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      signatures: [ PLAINTEXT, HM', 'HMAC-SHA1');
+    });
+
+    it("Security Scheme Declaration: OAuth 1.0 settings node signatures item RSA-SHA1", function () {
+        testCompletionByEntryEnd('basic/test30.raml', '\n      signatures: [ PLAINTEXT, HMAC-SHA1, RS', 'RSA-SHA1');
+    });
+
+    it("Declaring Annotation Type node 'type'", function () {
+        testCompletionByEntryEnd('basic/test31.raml', '\n    ty', 'type');
+    });
+
+    it("Declaring Annotation Type node 'type' values", function () {
+        testCompletionByEntryEnd('basic/test31.raml', '\n    type: str', 'strong, string');
+    });
+
+    it("Declaring Annotation Type node 'displayName'", function () {
+        testCompletionByEntryEnd('basic/test31.raml', '\n    disp', 'displayName');
+    });
+
+    it("Declaring Annotation Type node 'allowedTargets'", function () {
+        testCompletionByEntryEnd('basic/test31.raml', '\n    allow', 'allowedTargets');
+    });
+
+    it("Declaring Annotation Type node 'allowedTargets' items", function () {
+        testCompletionByEntryEnd('basic/test31.raml', '\n    allowedTargets: Resou', 'Resource, ResourceType');
+    });
+
+    it("Typed Fragments: DataType, DocumentationItem", function () {
+        testCompletionByEntryEnd('basic/test32.raml', '\n#%RAML 1.0 D', 'DataType, DocumentationItem');
+    });
+
+    it("Typed Fragments: DocumentationItem fragment node 'title'", function () {
+        testCompletionByEntryEnd('basic/test32.raml', '\ntit', 'title');
+    });
+
+    it("Typed Fragments: DocumentationItem fragment node 'content'", function () {
+        testCompletionByEntryEnd('basic/test32.raml', '\ncont', 'content');
+    });
+
+    it("Typed Fragments: DocumentationItem fragment node 'uses'", function () {
+        testCompletionByEntryEnd('basic/test32.raml', '\nus', 'uses');
+    });
+
+    it("Typed Fragments: DataType fragment node 'uses'", function () {
+        testCompletionByEntryEnd('basic/test33.raml', '\nus', 'uses');
+    });
+
+    it("Typed Fragments: NamedExample", function () {
+        testCompletionByEntryEnd('basic/test34.raml', '\n#%RAML 1.0 Nam', 'NamedExample');
+    });
+
+    it("Typed Fragments: ResourceType", function () {
+        testCompletionByEntryEnd('basic/test35.raml', '\n#%RAML 1.0 ResourceT', 'ResourceType');
+    });
+
+    it("Typed Fragments: Trait", function () {
+        testCompletionByEntryEnd('basic/test36.raml', '\n#%RAML 1.0 Tra', 'Trait');
+    });
+
+    it("Typed Fragments: SecurityScheme", function () {
+        testCompletionByEntryEnd('basic/test37.raml', '\n#%RAML 1.0 SecuritySc', 'SecurityScheme');
+    });
+
+    it("Typed Fragments: SecurityScheme node 'type'", function () {
+        testCompletionByEntryEnd('basic/test37.raml', '\nty', 'type');
+    });
+
+    it("Typed Fragments: AnnotationTypeDeclaration", function () {
+        testCompletionByEntryEnd('basic/test38.raml', '\n#%RAML 1.0 AnnotationTyp', 'AnnotationTypeDeclaration');
+    });
+
+    it("Typed Fragments: Library", function () {
+        testCompletionByEntryEnd('basic/test39.raml', '\n#%RAML 1.0 Li', 'Library');
+    });
+
+    it("Typed Fragments: Overlay", function () {
+        testCompletionByEntryEnd('basic/test40.raml', '\n#%RAML 1.0 Ove', 'Overlay');
+    });
+
+    it("Typed Fragments: Overlay node 'extends'", function () {
+        testCompletionByEntryEnd('basic/test40.raml', '\next', 'extends');
+    });
+
+    it("Typed Fragments: Extension", function () {
+        testCompletionByEntryEnd('basic/test41.raml', '\n#%RAML 1.0 Exte', 'Extension');
+    });
+
+    it("Typed Fragments: Extension node 'extends'", function () {
+        testCompletionByEntryEnd('basic/test41.raml', '\next', 'extends');
     });
 });
 
