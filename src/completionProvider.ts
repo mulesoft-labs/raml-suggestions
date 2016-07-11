@@ -159,6 +159,12 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
         }
 
         if(kind == parserApi.search.LocationKind.VALUE_COMPLETION) {
+            var parentPropertyOfAttr = attr && (<any>attr).parent && (<any>attr).parent() && (<any>attr).parent().property && (<any>attr).parent().property();
+            
+            if(parentPropertyOfAttr && (<any>universeHelpers).isUsesProperty(parentPropertyOfAttr)) {
+                return pathCompletion(request, provider.contentProvider, attr, hlnode, false);
+            }
+
             var proposals = valueCompletion(node, attr, request, provider);
 
             if(!attr){
@@ -613,6 +619,16 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IComplet
     var dn = contentProvider.contentDirName(request.content);
 
     var ll = contentProvider.resolve(dn, prefix);
+    
+    var indexOfDot = ll.lastIndexOf('.');
+
+    var indexOfSlash = ll.lastIndexOf('/');
+    
+    if(!(indexOfDot > 0 && (indexOfDot > indexOfSlash || indexOfSlash < 0))) {
+        indexOfDot = -1;
+    }
+
+    var typedPath = ll;
 
     if(ll) {
         dn = contentProvider.dirName(ll);
@@ -667,8 +683,18 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IComplet
     if(!known || !custom) {
         if(contentProvider.exists(dn) && contentProvider.isDirectory(dn)) {
             var dirContent = contentProvider.readDir(dn);
-            res = res.concat(dirContent.map(x=> {
-                return {text: x}
+            res = res.concat(dirContent.filter(x => {
+                try {
+                    var fullPath = contentProvider.resolve(dn, x);
+
+                    if(fullPath.indexOf(typedPath) === 0) {
+                        return true;
+                    }
+                } catch(exception) {
+                    return false;
+                }
+            }).map(x=> {
+                return {text: indexOfDot > 0 ? contentProvider.resolve(dn, x).substr(indexOfDot + 1) : x}
             }));
         }
     }
