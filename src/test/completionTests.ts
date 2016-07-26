@@ -196,10 +196,6 @@ describe("Basic completion tests", function() {
         testCompletionByEntryEnd('basic/test19.raml', '\n        descri', 'description');
     });
 
-    it("repeat facet completion", function () {
-        testCompletionByEntryEnd('basic/test19.raml', '\n        rep', 'repeat');
-    });
-
     it("required facet completion", function () {
         testCompletionByEntryEnd('basic/test19.raml', '\n        req', 'required');
     });
@@ -377,7 +373,7 @@ describe("Basic completion tests", function() {
     });
 
     it("Response codes", function () {
-        testCompletionByEntryEnd('basic/test27.raml', '\n      1', '1xx, 100, 101, 102');
+        testCompletionByEntryEnd('basic/test27.raml', '\n      1', '100, 101, 102');
     });
 
     it("Response headers", function () {
