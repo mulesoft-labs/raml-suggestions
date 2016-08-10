@@ -25,4 +25,4 @@ Implement `IFSProvider` interface to create File System data provider.
 
 Set default `IEditorStateProvider` and `IFSProvider` using `setDefaultEditorStateProvider` and `setDefaultFSProvider` methods.
 
-Call `suggestDefault` method to get default suggestions list using defaults providers or call `suggest` method taking `IEditorStateProvider` and `IFSProvider` as arguments.
+Call `suggestDefault` method to get default suggestions list using default providers or call `suggest` method taking `IEditorStateProvider` and `IFSProvider` as arguments.
