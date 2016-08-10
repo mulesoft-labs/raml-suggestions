@@ -81,7 +81,9 @@ export function suggest(editorState: IEditorStateProvider, fsProvider: IFSProvid
 }
 
 function doSuggest(request: CompletionRequest, provider: CompletionProvider) : Suggestion[] {
-    return getSuggestions(request, provider);
+    var result = getSuggestions(request, provider);
+    if (result) return result;
+    return [];
 }
 
 function getSuggestions(request: CompletionRequest, provider: CompletionProvider,
