@@ -1,7 +1,7 @@
 /**
- * Editor state.
+ * Editor state provider.
  */
-export interface IEditorState {
+export interface IEditorStateProvider {
 
     /**
      * Text of the document opened in the editor.
@@ -33,7 +33,7 @@ export interface IFSProvider {
      * Directory name of the file, opened in the specific editor.
      * @param content
      */
-    contentDirName(content: IEditorState): string;
+    contentDirName(content: IEditorStateProvider): string;
 
     /**
      * Directory name by full path

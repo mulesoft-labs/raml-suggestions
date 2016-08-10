@@ -6,7 +6,7 @@ import path = require('path');
 import fs = require('fs');
 
 class ContentProvider implements completion.IFSProvider {
-    contentDirName(content: completion.IEditorState): string {
+    contentDirName(content: completion.IEditorStateProvider): string {
         var contentPath = content.getPath();
         
         return path.dirname(contentPath);
@@ -35,7 +35,7 @@ class ContentProvider implements completion.IFSProvider {
     }
 }
 
-class FSContent implements completion.IEditorState {
+class FSContent implements completion.IEditorStateProvider {
     text: string;
         
     constructor(private filePath: string, public offset: number) {
@@ -69,7 +69,7 @@ function resolve(testPath: string): string {
 
 export function completionByOffset(filePath: string, offset: number): string {
 
-    var content: completion.IEditorState = new FSContent(resolve(filePath), offset);
+    var content: completion.IEditorStateProvider = new FSContent(resolve(filePath), offset);
 
     var result = completion.suggest(content, new ContentProvider());
 

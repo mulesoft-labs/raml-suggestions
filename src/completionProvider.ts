@@ -12,16 +12,16 @@ import services = def;
 import _ = require("underscore");
 
 import {IFSProvider} from "./completionProviderInterfaces";
-import {IEditorState} from "./completionProviderInterfaces";
+import {IEditorStateProvider} from "./completionProviderInterfaces";
 import {FSResolverExt} from "./completionProviderInterfaces";
 import {Suggestion} from "./completionProviderInterfaces";
 
 export class CompletionRequest {
-    content: IEditorState;
+    content: IEditorStateProvider;
 
     private prefixValue: string;
 
-    constructor(content: IEditorState) {
+    constructor(content: IEditorStateProvider) {
         this.content = content;
     }
 
@@ -73,7 +73,7 @@ export class CompletionProvider {
     }
 }
 
-export function suggest(editorState: IEditorState, fsProvider: IFSProvider) : Suggestion[] {
+export function suggest(editorState: IEditorStateProvider, fsProvider: IFSProvider) : Suggestion[] {
     var completionRequest = new CompletionRequest(editorState);
     var completionProvider = new CompletionProvider(fsProvider);
 
@@ -1738,7 +1738,7 @@ class ResolvedProvider implements IFSProvider {
         this.fsResolver = resolver;
     }
 
-    contentDirName(content: IEditorState): string {
+    contentDirName(content: IEditorStateProvider): string {
         return this.resolver.dirname(content.getPath());
     }
 

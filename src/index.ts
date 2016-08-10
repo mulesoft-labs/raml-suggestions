@@ -2,9 +2,9 @@ import completionProvider = require('./completionProvider');
 import completionProviderInterfaces = require('./completionProviderInterfaces');
 
 /**
- * Editor state.
+ * Editor state provider.
  */
-export type IEditorState = completionProviderInterfaces.IEditorState;
+export type IEditorStateProvider = completionProviderInterfaces.IEditorStateProvider;
 
 /**
  * Provides virtual file system data
@@ -31,14 +31,42 @@ export type FSResolver = completionProviderInterfaces.FSResolver;
  */
 export type FSResolverExt = completionProviderInterfaces.FSResolverExt;
 
+var _editorStateProvider: IEditorStateProvider = null;
+
+/**
+ * Sets default editor state provider
+ * @param editorStateProvider
+ */
+export function setDefaultEditorStateProvider(editorStateProvider: IEditorStateProvider) : void {
+    _editorStateProvider = editorStateProvider;
+}
+
+var _fsProvider: IFSProvider = null;
+
+/**
+ * Sets default FS provider.
+ * @param fsProvider
+ */
+export function setDefaultFSProvider(fsProvider: IFSProvider) : void {
+    _fsProvider = fsProvider;
+}
+
+/**
+ * Finds suggestions. Requires setDefaultEditorStateProvider and setDefaultFSProvider methods to be called first.
+ * @returns {Suggestion[]} - list of suggestions
+ */
+export function suggestDefault() : Suggestion[] {
+    return completionProvider.suggest(_editorStateProvider, _fsProvider);
+}
+
 /**
  * Finds suggestions.
  * @param editorState - editor state.
- * @param fsProvider - file system data provier.
+ * @param fsProvider - file system data provider.
  * @returns {Suggestion[]} - list of suggestions
  */
-export function suggest(editorState: IEditorState, fsProvider: IFSProvider) : Suggestion[] {
-    return completionProvider.suggest(editorState, fsProvider);
+export function suggest(editorStateProvider: IEditorStateProvider, fsProvider: IFSProvider) : Suggestion[] {
+    return completionProvider.suggest(editorStateProvider, fsProvider);
 }
 
 /**
