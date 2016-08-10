@@ -11,18 +11,81 @@ import services = def;
 
 import _ = require("underscore");
 
-import {ICompletionContentProvider} from "./index";
-import {IContent} from "./index";
-import {FSResolver} from "./index";
-import {CompletionProvider} from "./index";
-import {CompletionRequest} from "./index";
-import {Suggestion} from "./index";
+import {IFSProvider} from "./completionProviderInterfaces";
+import {IEditorState} from "./completionProviderInterfaces";
+import {FSResolverExt} from "./completionProviderInterfaces";
+import {Suggestion} from "./completionProviderInterfaces";
 
-export function suggest(request: CompletionRequest, provider: CompletionProvider) {
+export class CompletionRequest {
+    content: IEditorState;
+
+    private prefixValue: string;
+
+    constructor(content: IEditorState) {
+        this.content = content;
+    }
+
+    prefix(): string {
+        if(typeof this.prefixValue !== 'undefined') {
+            return this.prefixValue;
+        }
+
+        return getPrefix(this);
+    }
+
+    setPrefix(value: string): void {
+        this.prefixValue = value;
+    }
+
+    valuePrefix(): string {
+        var offset = this.content.getOffset();
+
+        var text = this.content.getText();
+
+        for(var i = offset - 1; i >= 0; i--) {
+            var c = text.charAt(i);
+
+            if(c === '\r' || c === '\n' || c=== ' ' || c=== '\t' || c ==='"' || c=== '\'' || c === ':' || c === '(') {
+                return text.substring(i+1,offset);
+            }
+
+        }
+
+        return "";
+    }
+}
+
+export class CompletionProvider {
+    contentProvider: IFSProvider
+
+    currentRequest : CompletionRequest = null;
+
+    level: number = 0;
+
+    constructor(contentProvider: IFSProvider) {
+        this.contentProvider = contentProvider;
+    }
+
+    suggest(request: CompletionRequest, doPostProcess: boolean = false) {
+        var suggestions: any[] = doSuggest(request, this);
+
+        return doPostProcess ? postProcess(suggestions, request) : suggestions;
+    }
+}
+
+export function suggest(editorState: IEditorState, fsProvider: IFSProvider) : Suggestion[] {
+    var completionRequest = new CompletionRequest(editorState);
+    var completionProvider = new CompletionProvider(fsProvider);
+
+    return completionProvider.suggest(completionRequest, true);
+}
+
+function doSuggest(request: CompletionRequest, provider: CompletionProvider) : Suggestion[] {
     return getSuggestions(request, provider);
 }
 
-function getSuggestions(request: CompletionRequest, provider: CompletionProvider, preParsedAst: parserApi.hl.IParseResult = undefined): Suggestion[] {
+function getSuggestions(request: CompletionRequest, provider: CompletionProvider,
+                        preParsedAst: parserApi.hl.IParseResult = undefined): Suggestion[] {
     provider.currentRequest = request;
 
     try {
@@ -32,7 +95,7 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
 
         provider.level ++;
 
-        var offset = request.position.getOffset();
+        var offset = request.content.getOffset();
 
         var text = request.content.getText();
 
@@ -446,7 +509,7 @@ function ramlVersionCompletion(request: CompletionRequest): Suggestion[] {
 
     var text = request.content.getText();
 
-    var offset = request.position.getOffset();
+    var offset = request.content.getOffset();
 
     var start = text.substr(0, offset);
 
@@ -495,15 +558,15 @@ function ramlVersionCompletion(request: CompletionRequest): Suggestion[] {
 };
 
 function completionKind(request: CompletionRequest) {
-    return parserApi.search.determineCompletionKind(request.content.getText(), request.position.getOffset());
+    return parserApi.search.determineCompletionKind(request.content.getText(), request.content.getOffset());
 }
 
-function getAstNode(request: CompletionRequest, contentProvider: ICompletionContentProvider, clearLastChar: boolean = true, allowNull: boolean = true): parserApi.hl.IParseResult {
+function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, clearLastChar: boolean = true, allowNull: boolean = true): parserApi.hl.IParseResult {
     var newProjectId: string = contentProvider.contentDirName(request.content);
 
-    var project: any = parserApi.project.createProject(newProjectId, <FSResolver>(<any>contentProvider).fsResolver);
+    var project: any = parserApi.project.createProject(newProjectId, <FSResolverExt>(<any>contentProvider).fsResolver);
 
-    var offset = request.position.getOffset();
+    var offset = request.content.getOffset();
 
     var text = request.content.getText();
 
@@ -603,7 +666,7 @@ function getIndent2(offset:number,text:string): string {
     }
 }
 
-function pathCompletion(request:CompletionRequest, contentProvider: ICompletionContentProvider, attr: parserApi.hl.IAttribute, hlNode: parserApi.hl.IHighLevelNode, custom: boolean) {
+function pathCompletion(request:CompletionRequest, contentProvider: IFSProvider, attr: parserApi.hl.IAttribute, hlNode: parserApi.hl.IHighLevelNode, custom: boolean) {
     var prefix = request.valuePrefix();
 
     if(prefix.indexOf("#") === -1) {
@@ -613,7 +676,7 @@ function pathCompletion(request:CompletionRequest, contentProvider: ICompletionC
     }
 }
 
-function pathPartCompletion(request:CompletionRequest, contentProvider: ICompletionContentProvider, attr: parserApi.hl.IAttribute, hlNode: parserApi.hl.IHighLevelNode, custom:boolean) {
+function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvider, attr: parserApi.hl.IAttribute, hlNode: parserApi.hl.IHighLevelNode, custom:boolean) {
     var prefix = request.valuePrefix();
 
     var dn = contentProvider.contentDirName(request.content);
@@ -702,7 +765,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IComplet
     return res;
 }
 
-function fromDir(prefix: string, dn:string, dirToLook: string, contentProvider: ICompletionContentProvider){
+function fromDir(prefix: string, dn:string, dirToLook: string, contentProvider: IFSProvider){
     var pss = contentProvider.resolve(dn,dirToLook);
 
     if(contentProvider.exists(pss)) {
@@ -716,7 +779,7 @@ function fromDir(prefix: string, dn:string, dirToLook: string, contentProvider: 
     return [];
 }
 
-function pathReferencePartCompletion(request:CompletionRequest, contentProvider: ICompletionContentProvider, attr:parserApi.hl.IAttribute,hlNode:parserApi.hl.IHighLevelNode,custom:boolean){
+function pathReferencePartCompletion(request:CompletionRequest, contentProvider: IFSProvider, attr:parserApi.hl.IAttribute, hlNode:parserApi.hl.IHighLevelNode, custom:boolean){
     var prefix = request.valuePrefix();
 
     var includePath = parserApi.schema.getIncludePath(prefix);
@@ -794,7 +857,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     var onlyKey=false;
 
     var text = request.content.getText();
-    var offset = request.position.getOffset();
+    var offset = request.content.getOffset();
 
     if (hasNewLine) {
         var is = getIndentWithSequenc(node.lowLevel().keyStart(), text);
@@ -936,7 +999,7 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
     var hlnode = <parserApi.hl.IHighLevelNode>node;
 
     var text = request.content.getText();
-    var offset = request.position.getOffset();
+    var offset = request.content.getOffset();
 
     if(attr) {
         var p: parserApi.hl.IProperty = attr.property();
@@ -1031,7 +1094,7 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
 
 function findASTNodeByOffset(ast : parserApi.hl.IHighLevelNode, request: CompletionRequest) : parserApi.hl.IParseResult {
     var text = request.content.getText();
-    var cm = request.position.getOffset();
+    var cm = request.content.getOffset();
 
     for (var pm=cm-1;pm>=0;pm--){
         var c=text[pm];
@@ -1652,7 +1715,7 @@ export function getPrefix(request: CompletionRequest): string {
 }
 
 function getLine(request: CompletionRequest): string {
-    var offset: number = request.position.getOffset();
+    var offset: number = request.content.getOffset();
 
     var text: string = request.content.getText();
 
@@ -1668,14 +1731,14 @@ function getLine(request: CompletionRequest): string {
     return "";
 }
 
-class ResolvedProvider implements ICompletionContentProvider {
-    fsResolver: FSResolver;
+class ResolvedProvider implements IFSProvider {
+    fsResolver: FSResolverExt;
     
-    constructor(private resolver: FSResolver) {
+    constructor(private resolver: FSResolverExt) {
         this.fsResolver = resolver;
     }
 
-    contentDirName(content: IContent): string {
+    contentDirName(content: IEditorState): string {
         return this.resolver.dirname(content.getPath());
     }
 
@@ -1700,6 +1763,6 @@ class ResolvedProvider implements ICompletionContentProvider {
     }
 }
 
-export function getContentProvider(resolver: FSResolver): ICompletionContentProvider {
+export function getContentProvider(resolver: FSResolverExt): IFSProvider {
     return new ResolvedProvider(resolver);
 }

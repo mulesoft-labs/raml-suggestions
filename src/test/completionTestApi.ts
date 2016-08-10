@@ -4,10 +4,9 @@ import completion = require('../index');
 
 import path = require('path');
 import fs = require('fs');
-import {CompletionProvider} from "../index";
 
-class ContentProvider implements completion.ICompletionContentProvider {
-    contentDirName(content: completion.IContent): string {
+class ContentProvider implements completion.IFSProvider {
+    contentDirName(content: completion.IEditorState): string {
         var contentPath = content.getPath();
         
         return path.dirname(contentPath);
@@ -36,10 +35,10 @@ class ContentProvider implements completion.ICompletionContentProvider {
     }
 }
 
-class FSContent implements completion.IContent {
+class FSContent implements completion.IEditorState {
     text: string;
         
-    constructor(private filePath: string) {
+    constructor(private filePath: string, public offset: number) {
         this.text = fs.readFileSync(filePath).toString();
     }
     
@@ -54,13 +53,7 @@ class FSContent implements completion.IContent {
     getBaseName(): string {
         return path.basename(this.filePath);
     }
-}
 
-class Position implements completion.IPosition {
-    constructor(private offset: number) {
-        
-    }
-    
     getOffset(): number {
         return this.offset;
     }
@@ -75,24 +68,22 @@ function resolve(testPath: string): string {
 }
 
 export function completionByOffset(filePath: string, offset: number): string {
-    var completionProvider: CompletionProvider = new CompletionProvider(new ContentProvider());
 
-    var content: completion.IContent = new FSContent(resolve(filePath));
-    var position: completion.IPosition = new Position(offset);
+    var content: completion.IEditorState = new FSContent(resolve(filePath), offset);
 
-    var result = completionProvider.suggest(new completion.CompletionRequest(content, position), true);
+    var result = completion.suggest(content, new ContentProvider());
 
     return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
 }
 
 export function completionByUniqueEntry(filePath: string, entry: string, begin: boolean = false): string {
-    var completionProvider: CompletionProvider = new CompletionProvider(new ContentProvider());
 
-    var content: completion.IContent = new FSContent(resolve(filePath));
 
-    var position: completion.IPosition = new Position(begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText()));
+    var content = new FSContent(resolve(filePath), 0);
+    var position = begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText());
+    content.offset = position;
 
-    var result = completionProvider.suggest(new completion.CompletionRequest(content, position), true);
+    var result = completion.suggest(content, new ContentProvider());
 
     return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
 }

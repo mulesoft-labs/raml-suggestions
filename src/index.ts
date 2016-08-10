@@ -1,116 +1,51 @@
 import completionProvider = require('./completionProvider');
+import completionProviderInterfaces = require('./completionProviderInterfaces');
 
-export interface ICompletionContentProvider {
-    contentDirName(content: IContent): string;
+/**
+ * Editor state.
+ */
+export type IEditorState = completionProviderInterfaces.IEditorState;
 
-    dirName(string: string): string;
+/**
+ * Provides virtual file system data
+ */
+export type IFSProvider = completionProviderInterfaces.IFSProvider;
 
-    exists(path: string): boolean;
+/**
+ * Completion suggestion.
+ *
+ * Suggestion may have all of text, description and displayText filled,
+ * but may have only some of them.
+ * Priority of the field to use for display: displayText, text.
+ * Priority of the field to use for text replacement: text, displayText.
+ */
+export type Suggestion = completionProviderInterfaces.Suggestion;
 
-    resolve(contextPath: string, relativePath: string): string;
+/**
+ * Direct analogue of JS parser FSResolver, introduced for compatibility.
+ */
+export type FSResolver = completionProviderInterfaces.FSResolver;
 
-    isDirectory(path: string): boolean;
+/**
+ * Extended JS parser FSResolver, being able to provide more FS data.
+ */
+export type FSResolverExt = completionProviderInterfaces.FSResolverExt;
 
-    readDir(path: string): string[];
+/**
+ * Finds suggestions.
+ * @param editorState - editor state.
+ * @param fsProvider - file system data provier.
+ * @returns {Suggestion[]} - list of suggestions
+ */
+export function suggest(editorState: IEditorState, fsProvider: IFSProvider) : Suggestion[] {
+    return completionProvider.suggest(editorState, fsProvider);
 }
 
-export interface Suggestion {
-    text?: string;
-    description?: string;
-    displayText?: string;
-    prefix?: string
-}
-
-export interface IContent {
-    getText(): string;
-
-    getPath(): string;
-
-    getBaseName(): string;
-}
-
-export interface IPosition {
-    getOffset(): number;
-}
-
-export class CompletionRequest {
-    content: IContent;
-
-    position: IPosition;
-
-    private prefixValue: string;
-
-    constructor(content: IContent, position: IPosition) {
-        this.content = content;
-        this.position = position;
-    }
-
-    prefix(): string {
-        if(typeof this.prefixValue !== 'undefined') {
-            return this.prefixValue;
-        }
-
-        return completionProvider.getPrefix(this);
-    }
-
-    setPrefix(value: string): void {
-        this.prefixValue = value;
-    }
-
-    valuePrefix(): string {
-        var offset = this.position.getOffset();
-
-        var text = this.content.getText();
-
-        for(var i = offset - 1; i >= 0; i--) {
-            var c = text.charAt(i);
-
-            if(c === '\r' || c === '\n' || c=== ' ' || c=== '\t' || c ==='"' || c=== '\'' || c === ':' || c === '(') {
-                return text.substring(i+1,offset);
-            }
-
-        }
-
-        return "";
-    }
-}
-
-export class CompletionProvider {
-    contentProvider: ICompletionContentProvider
-
-    currentRequest : CompletionRequest = null;
-
-    level: number = 0;
-
-    constructor(contentProvider: ICompletionContentProvider) {
-        this.contentProvider = contentProvider;
-    }
-
-    suggest(request: CompletionRequest, doPostProcess: boolean = false) {
-        var suggestions: any[] = completionProvider.suggest(request, this);
-
-        return doPostProcess ? completionProvider.postProcess(suggestions, request) : suggestions;
-    }
-}
-
-export interface FSResolver {
-    content(path:string): string;
-    
-    list(path: string): string[];
-
-    exists(path: string): boolean;
-
-    contentAsync(path:string):Promise<string>;
-    
-    dirname(path: string): string;
-
-    resolve(contextPath: string, relativePath: string): string;
-    
-    extname(path: string): string;
-    
-    isDirectory(path: string): boolean;
-}
-
-export function getContentProvider(resolver: FSResolver): ICompletionContentProvider {
+/**
+ * Converts extended fs resolver to FS provider.
+ * @param resolver
+ * @returns {IFSProvider}
+ */
+export function getContentProvider(resolver: FSResolverExt): IFSProvider {
     return completionProvider.getContentProvider(resolver);
 }
