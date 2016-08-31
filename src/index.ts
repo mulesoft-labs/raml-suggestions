@@ -6,12 +6,18 @@ export interface ICompletionContentProvider {
     dirName(string: string): string;
 
     exists(path: string): boolean;
+    
+    existsAsync(path: string): Promise<boolean>;
 
     resolve(contextPath: string, relativePath: string): string;
 
     isDirectory(path: string): boolean;
 
     readDir(path: string): string[];
+    
+    readDirAsync(path: string): Promise<string[]>;
+
+    isDirectoryAsync(path: string): Promise<boolean>;
 }
 
 export interface Suggestion {
@@ -39,6 +45,10 @@ export class CompletionRequest {
     position: IPosition;
 
     private prefixValue: string;
+
+    async: boolean = false;
+    
+    promises: Promise<any[]>[];
 
     constructor(content: IContent, position: IPosition) {
         this.content = content;
@@ -86,10 +96,14 @@ export class CompletionProvider {
         this.contentProvider = contentProvider;
     }
 
-    suggest(request: CompletionRequest, doPostProcess: boolean = false) {
+    suggest(request: CompletionRequest, doPostProcess: boolean = false): any[] {
         var suggestions: any[] = completionProvider.suggest(request, this);
 
         return doPostProcess ? completionProvider.postProcess(suggestions, request) : suggestions;
+    }
+    
+    suggestAsync(request: CompletionRequest, doPostProcess: boolean = false): Promise<any[]> {
+        return completionProvider.suggestAsync(request, this).then(suggestions => doPostProcess ? completionProvider.postProcess(suggestions, request) : suggestions, error => error);
     }
 }
 
@@ -109,6 +123,12 @@ export interface FSResolver {
     extname(path: string): string;
     
     isDirectory(path: string): boolean;
+    
+    isDirectoryAsync(path: string): Promise<boolean>;
+    
+    existsAsync(path: string): Promise<boolean>;
+    
+    listAsync(path: string): Promise<string[]>;
 }
 
 export function getContentProvider(resolver: FSResolver): ICompletionContentProvider {
