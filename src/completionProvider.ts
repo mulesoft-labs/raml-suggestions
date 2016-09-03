@@ -21,6 +21,10 @@ export class CompletionRequest {
 
     private prefixValue: string;
 
+    async: boolean = false;
+
+    promises: Promise<any[]>[];
+
     constructor(content: IEditorStateProvider) {
         this.content = content;
     }
@@ -66,10 +70,14 @@ export class CompletionProvider {
         this.contentProvider = contentProvider;
     }
 
-    suggest(request: CompletionRequest, doPostProcess: boolean = false) {
+    suggest(request: CompletionRequest, doPostProcess: boolean = false) : any[] {
         var suggestions: any[] = doSuggest(request, this);
 
         return doPostProcess ? postProcess(suggestions, request) : suggestions;
+    }
+
+    suggestAsync(request: CompletionRequest, doPostProcess: boolean = false): Promise<any[]> {
+        return doSuggestAsync(request, this).then(suggestions => doPostProcess ? postProcess(suggestions, request) : suggestions, error => error);
     }
 }
 
@@ -80,21 +88,29 @@ export function suggest(editorState: IEditorStateProvider, fsProvider: IFSProvid
     return completionProvider.suggest(completionRequest, true);
 }
 
+export function suggestAsync(editorState: IEditorStateProvider, fsProvider: IFSProvider) : Promise<Suggestion[]> {
+    var completionRequest = new CompletionRequest(editorState);
+    var completionProvider = new CompletionProvider(fsProvider);
+
+    return completionProvider.suggestAsync(completionRequest, true);
+}
+
 function doSuggest(request: CompletionRequest, provider: CompletionProvider) : Suggestion[] {
     var result = getSuggestions(request, provider);
     if (result) return result;
     return [];
 }
 
-export function suggestAsync(request: CompletionRequest, provider: CompletionProvider): Promise<Suggestion[]> {
+function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider): Promise<Suggestion[]> {
     request.async = true;
     request.promises = [];
 
     var apiPromise = parserApi.parseRAML(modifiedContent(request), {
-        fsResolver: (<any>provider.contentProvider).fsResolver
-    }, request.content.getPath());
+        fsResolver: (<any>provider.contentProvider).fsResolver,
+        filePath: request.content.getPath()
+    });
 
-    var suggestionsPromise = apiPromise.then(api => getSuggestions(request, provider, findAtOffsetInNode(request.position.getOffset(), api.highLevel())));
+    var suggestionsPromise = apiPromise.then(api => getSuggestions(request, provider, findAtOffsetInNode(request.content.getOffset(), api.highLevel())));
 
     var requestSuggestionsPromise = suggestionsPromise.then((suggestions: Suggestion[]) => {
         return Promise.all([suggestions].concat(request.promises));
@@ -633,7 +649,7 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
 }
 
 function modifiedContent(request: CompletionRequest): string {
-    var offset = request.position.getOffset();
+    var offset = request.content.getOffset();
 
     var text = request.content.getText();
 
@@ -847,7 +863,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
     return res;
 }
 
-function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: string, indexOfDot: number, contentProvider: ICompletionContentProvider, promises: Promise<any[]>[]): void {
+function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: string, indexOfDot: number, contentProvider: IFSProvider, promises: Promise<any[]>[]): void {
     if(promises) {
         var asString: string;
 
@@ -889,7 +905,7 @@ function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: st
     }
 }
 
-function fromDir(prefix: string, dn:string | Promise<string>, dirToLook: string, contentProvider: ICompletionContentProvider, promises?: Promise<any[]>[]){
+function fromDir(prefix: string, dn:string | Promise<string>, dirToLook: string, contentProvider: IFSProvider, promises?: Promise<any[]>[]){
     if(promises) {
         var existsPromise = (<Promise<string>>dn).then(dirName => {
             var pss = contentProvider.resolve(<string>dirName, dirToLook);
