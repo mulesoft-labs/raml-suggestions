@@ -48,6 +48,12 @@ export interface IFSProvider {
     exists(fullPath: string): boolean;
 
     /**
+     * Checks whether an item exists by full path.
+     * @param path
+     */
+    existsAsync(path: string): Promise<boolean>;
+
+    /**
      * Resolves one path against another.
      * @param contextPath - path to resolve against.
      * @param relativePath - relative path to resolve.
@@ -65,6 +71,18 @@ export interface IFSProvider {
      * @param fullPath
      */
     readDir(fullPath: string): string[];
+
+    /**
+     * Returns directory content list.
+     * @param fullPath
+     */
+    readDirAsync(path: string): Promise<string[]>;
+
+    /**
+     * Check whether the path points to a directory.
+     * @param fullPath
+     */
+    isDirectoryAsync(path: string): Promise<boolean>;
 }
 
 /**
@@ -157,4 +175,22 @@ export interface FSResolverExt extends FSResolver {
      * @param fullPath
      */
     isDirectory(fullPath: string): boolean;
+
+    /**
+     * Check whether the path points to a directory.
+     * @param fullPath
+     */
+    isDirectoryAsync(path: string): Promise<boolean>;
+
+    /**
+     * Checks item existance.
+     * @param fullPath
+     */
+    existsAsync(path: string): Promise<boolean>;
+
+    /**
+     * Lists directory contents.
+     * @param fullPath
+     */
+    listAsync(path: string): Promise<string[]>;
 }

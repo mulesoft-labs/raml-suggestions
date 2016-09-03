@@ -83,20 +83,19 @@ export function completionByOffset(filePath: string, offset: number): string {
 
     var content: completion.IEditorStateProvider = new FSContent(resolve(filePath), offset);
 
-    var result = completion.suggest(content, new ContentProvider());
+    var result = completion.suggest(content, new SyncContentProvider());
 
     return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
 }
 
 export function completionByOffsetAsync(filePath: string, offset: number, callback: (result: string) => void): void {
-    var completionProvider: CompletionProvider = new CompletionProvider(completion.getContentProvider(new AsyncFSResolver()));
+    var content: completion.IEditorStateProvider = new FSContent(resolve(filePath), offset);
 
-    var content: completion.IContent = new FSContent(resolve(filePath));
-    var position: completion.IPosition = new Position(offset);
+    var result = completion.suggestAsync(content, new SyncContentProvider());
 
-    completionProvider.suggestAsync(new completion.CompletionRequest(content, position), true).then(result => {
+    result.then(result => {
         callback(result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', '));
-    });
+    })
 }
 
 export function completionByUniqueEntry(filePath: string, entry: string, begin: boolean = false): string {
@@ -106,21 +105,20 @@ export function completionByUniqueEntry(filePath: string, entry: string, begin: 
     var position = begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText());
     content.offset = position;
 
-    var result = completion.suggest(content, new ContentProvider());
+    var result = completion.suggest(content, new SyncContentProvider());
 
     return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
 }
 
 export function completionByUniqueEntryAsync(filePath: string, entry: string, begin: boolean = false, callback: (result: string) => void): void {
-    var completionProvider: CompletionProvider = new CompletionProvider(completion.getContentProvider(new AsyncFSResolver()));
+    var content = new FSContent(resolve(filePath), 0);
+    var position = begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText());
+    content.offset = position;
 
-    var content: completion.IContent = new FSContent(resolve(filePath));
-
-    var position: completion.IPosition = new Position(begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText()));
-
-    completionProvider.suggestAsync(new completion.CompletionRequest(content, position), true).then(result => {
+    var result = completion.suggestAsync(content, completion.getContentProvider(new AsyncFSResolver()));
+    result.then(result => {
         callback(result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', '));
-    });
+    })
 }
 
 class AsyncFSResolver {
