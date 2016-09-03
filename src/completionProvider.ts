@@ -86,6 +86,33 @@ function doSuggest(request: CompletionRequest, provider: CompletionProvider) : S
     return [];
 }
 
+export function suggestAsync(request: CompletionRequest, provider: CompletionProvider): Promise<Suggestion[]> {
+    request.async = true;
+    request.promises = [];
+
+    var apiPromise = parserApi.parseRAML(modifiedContent(request), {
+        fsResolver: (<any>provider.contentProvider).fsResolver
+    }, request.content.getPath());
+
+    var suggestionsPromise = apiPromise.then(api => getSuggestions(request, provider, findAtOffsetInNode(request.position.getOffset(), api.highLevel())));
+
+    var requestSuggestionsPromise = suggestionsPromise.then((suggestions: Suggestion[]) => {
+        return Promise.all([suggestions].concat(request.promises));
+    });
+
+    var finalPromise = requestSuggestionsPromise.then((arrays: Suggestion[][]) => {
+        var result: Suggestion[] = [];
+
+        arrays.forEach((suggestions => {
+            result = result.concat(suggestions);
+        }));
+
+        return result;
+    });
+
+    return finalPromise;
+}
+
 function getSuggestions(request: CompletionRequest, provider: CompletionProvider,
                         preParsedAst: parserApi.hl.IParseResult = undefined): Suggestion[] {
     provider.currentRequest = request;
@@ -605,6 +632,40 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
     return astNode;
 }
 
+function modifiedContent(request: CompletionRequest): string {
+    var offset = request.position.getOffset();
+
+    var text = request.content.getText();
+
+    var kind = completionKind(request);
+
+    if(kind === parserApi.search.LocationKind.KEY_COMPLETION){
+        text = text.substring(0, offset) + "k:" + text.substring(offset);
+    }
+
+    return text;
+}
+
+function findAtOffsetInNode(offset: number, node: parserApi.hl.IHighLevelNode): parserApi.hl.IParseResult {
+    var actualOffset = offset;
+
+    var text = node.lowLevel().unit().contents();
+
+    for(var currentOffset = offset - 1; currentOffset >= 0; currentOffset--){
+        var symbol = text[currentOffset];
+
+        if(symbol === ' ' || symbol === '\t') {
+            actualOffset = currentOffset - 1;
+
+            continue;
+        }
+
+        break;
+    }
+
+    return node.findElementAtOffset(actualOffset);
+}
+
 function getIndent(offset:number,text:string): string {
     var spaces = "";
     for (var i = offset - 1; i >= 0; i--) {
@@ -681,9 +742,9 @@ function pathCompletion(request:CompletionRequest, contentProvider: IFSProvider,
 function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvider, attr: parserApi.hl.IAttribute, hlNode: parserApi.hl.IHighLevelNode, custom:boolean) {
     var prefix = request.valuePrefix();
 
-    var dn = contentProvider.contentDirName(request.content);
+    var dn: string | Promise<string> = contentProvider.contentDirName(request.content);
 
-    var ll = contentProvider.resolve(dn, prefix);
+    var ll = contentProvider.resolve(<string>dn, prefix);
     
     var indexOfDot = ll.lastIndexOf('.');
 
@@ -697,8 +758,22 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
 
     if(ll) {
         dn = contentProvider.dirName(ll);
-
-        if(contentProvider.exists(ll) && contentProvider.isDirectory(ll)){
+        
+        if(request.async) {
+            dn = contentProvider.existsAsync(ll).then(isExists => {
+                if(!isExists) {
+                    return contentProvider.dirName(ll);
+                }
+                
+                return contentProvider.isDirectoryAsync(ll).then(isDirectory => {
+                    if(!isDirectory) {
+                        return contentProvider.dirName(ll);
+                    }
+                    
+                    return ll;
+                })
+            })
+        } else if(contentProvider.exists(ll) && contentProvider.isDirectory(ll)){
             dn=ll;
         }
     }
@@ -710,14 +785,14 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
     if(attr) {
         if(custom) {
             if(attr.name() === 'example') {
-                res = res.concat(fromDir(prefix, dn, "examples", contentProvider));
+                res = res.concat(fromDir(prefix, dn, "examples", contentProvider, request.promises));
                 known = true;
             }
 
             if(attr.name() === 'value' &&
                 parserApi.universeHelpers.isGlobalSchemaType(attr.parent().definition())) {
 
-                res = res.concat(fromDir(prefix, dn, "schemas", contentProvider));
+                res = res.concat(fromDir(prefix, dn, "schemas", contentProvider, request.promises));
 
                 known = true;
             }
@@ -727,30 +802,35 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
     if (!attr) {
         if (custom) {
             if (parserApi.universeHelpers.isTraitType(hlNode.definition())) {
-                res = res.concat(fromDir(prefix, dn, "traits", contentProvider));
+                res = res.concat(fromDir(prefix, dn, "traits", contentProvider, request.promises));
                 known = true;
             }
             if (parserApi.universeHelpers.isResourceTypeType(hlNode.definition())) {
-                res = res.concat(fromDir(prefix, dn, "resourceTypes", contentProvider));
+                res = res.concat(fromDir(prefix, dn, "resourceTypes", contentProvider, request.promises));
                 known = true;
             }
             if (parserApi.universeHelpers.isSecuritySchemaType(hlNode.definition())) {
-                res = res.concat(fromDir(prefix, dn, "securitySchemes", contentProvider));
+                res = res.concat(fromDir(prefix, dn, "securitySchemes", contentProvider, request.promises));
                 known = true;
             }
             if (parserApi.universeHelpers.isGlobalSchemaType(hlNode.definition())) {
-                res = res.concat(fromDir(prefix, dn, "schemas", contentProvider));
+                res = res.concat(fromDir(prefix, dn, "schemas", contentProvider, request.promises));
                 known = true;
             }
         }
     }
 
     if(!known || !custom) {
-        if(contentProvider.exists(dn) && contentProvider.isDirectory(dn)) {
-            var dirContent = contentProvider.readDir(dn);
+        if(request.async) {
+            filtredDirContentAsync(dn, typedPath, indexOfDot, contentProvider, request.promises);
+        } else if(contentProvider.exists(<string>dn) && contentProvider.isDirectory(<string>dn)) {
+            var dirContent = contentProvider.readDir(<string>dn);
+
+
+
             res = res.concat(dirContent.filter(x => {
                 try {
-                    var fullPath = contentProvider.resolve(dn, x);
+                    var fullPath = contentProvider.resolve(<string>dn, x);
 
                     if(fullPath.indexOf(typedPath) === 0) {
                         return true;
@@ -759,7 +839,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
                     return false;
                 }
             }).map(x=> {
-                return {text: indexOfDot > 0 ? contentProvider.resolve(dn, x).substr(indexOfDot + 1) : x}
+                return {text: indexOfDot > 0 ? contentProvider.resolve(<string>dn, x).substr(indexOfDot + 1) : x}
             }));
         }
     }
@@ -767,8 +847,74 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
     return res;
 }
 
-function fromDir(prefix: string, dn:string, dirToLook: string, contentProvider: IFSProvider){
-    var pss = contentProvider.resolve(dn,dirToLook);
+function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: string, indexOfDot: number, contentProvider: ICompletionContentProvider, promises: Promise<any[]>[]): void {
+    if(promises) {
+        var asString: string;
+
+        var exists = (<Promise<string>>dirName).then(dirNameStr => {
+            asString = <string>dirNameStr;
+
+            return contentProvider.existsAsync(dirNameStr)
+        });
+
+        var dirContent = exists.then(isExists => {
+            if(!isExists) {
+                return [];
+            }
+
+            return contentProvider.isDirectoryAsync(asString).then(isDir => {
+                if(!isDir) {
+                    return [];
+                }
+
+                return contentProvider.readDirAsync(asString).then(dirContent => {
+                    return dirContent.filter(x => {
+                        try {
+                            var fullPath = contentProvider.resolve(asString, x);
+
+                            if(fullPath.indexOf(typedPath) === 0) {
+                                return true;
+                            }
+                        } catch(exception) {
+                            return false;
+                        }
+                    }).map(x=> {
+                        return {text: indexOfDot > 0 ? contentProvider.resolve(<string>dirName, x).substr(indexOfDot + 1) : x}
+                    });
+                });
+            });
+        });
+
+        promises.push(dirContent);
+    }
+}
+
+function fromDir(prefix: string, dn:string | Promise<string>, dirToLook: string, contentProvider: ICompletionContentProvider, promises?: Promise<any[]>[]){
+    if(promises) {
+        var existsPromise = (<Promise<string>>dn).then(dirName => {
+            var pss = contentProvider.resolve(<string>dirName, dirToLook);
+
+            return contentProvider.existsAsync(pss);
+        });
+
+        var proposalsPromise = existsPromise.then(result => {
+            if(result) {
+                return contentProvider.readDirAsync(pss).then(dirNames => {
+                    var proposals = dirNames.map(x => {return {text:x,replacementPrefix:prefix,extra:"./"+dirToLook+"/"}});
+
+                    return proposals;
+                })
+            }
+
+            return [];
+        });
+
+        promises.push(proposalsPromise);
+
+        return [];
+    }
+
+    var pss = contentProvider.resolve(<string>dn,dirToLook);
 
     if(contentProvider.exists(pss)) {
         var dirContent = contentProvider.readDir(pss);
@@ -1087,8 +1233,6 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
             return rs;
         }
         if (universeHelpers.isExampleSpecType(hlnode.definition())){
-            console.log('Buzzinga!!!');
-
             return examplePropertyCompletion(hlnode, request, provider);
         }
     }
@@ -1760,8 +1904,20 @@ class ResolvedProvider implements IFSProvider {
         return this.resolver.isDirectory(path);
     }
 
+    isDirectoryAsync(path: string): Promise<boolean> {
+        return this.resolver.isDirectoryAsync(path);
+    }
+
     readDir(path: string): string[] {
         return this.resolver.list(path);
+    }
+
+    existsAsync(path: string): Promise<boolean> {
+        return this.resolver.existsAsync(path);
+    }
+
+    readDirAsync(path: string): Promise<string[]> {
+        return this.resolver.listAsync(path);
     }
 }
 
