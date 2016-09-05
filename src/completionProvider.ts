@@ -16,6 +16,8 @@ import {IEditorStateProvider} from "./completionProviderInterfaces";
 import {FSResolverExt} from "./completionProviderInterfaces";
 import {Suggestion} from "./completionProviderInterfaces";
 
+var categories = require("../resources/categories.json");
+
 export class CompletionRequest {
     content: IEditorStateProvider;
 
@@ -93,6 +95,52 @@ export function suggestAsync(editorState: IEditorStateProvider, fsProvider: IFSP
     var completionProvider = new CompletionProvider(fsProvider);
 
     return completionProvider.suggestAsync(completionRequest, true);
+}
+
+function categoryByRanges(suggestion: string, parentRange: services.ITypeDefinition, propertyRange: services.ITypeDefinition): string {
+    var categoryNames:string[] = Object.keys(categories);
+
+    for(var i = 0; i < categoryNames.length; i++) {
+        var categoryName = categoryNames[i];
+
+        var issues = Object.keys(categories[categoryName]);
+        
+        for(var j = 0; j < issues.length; j++) {
+            var issueName = issues[j];
+            
+            if(issueName !== suggestion) {
+                continue;
+            }
+            
+            var issue = categories[categoryName][issueName];
+
+            var propertyIs = issue.is || [];
+            var parentIs = issue.parentIs || [];
+
+            if(propertyRange && _.find(propertyIs, (name: string) => isRangeAssignable(propertyRange, name))) {
+                return categoryName;
+            }
+
+            if(parentRange && _.find(parentIs, (name: string) => isRangeAssignable(parentRange, name))) {
+                return categoryName;
+            }
+        }
+    }
+
+    return 'unknown';
+}
+
+function isRangeAssignable(type: services.ITypeDefinition, defCode: string) {
+
+    var keys = defCode.split(".");
+
+    var defObject: any = parserApi.universes;
+
+    for(var i = 0; i < keys.length; i++) {
+        defObject = defObject[keys[i]];
+    }
+
+    return type.isAssignableFrom(defObject.name);
 }
 
 function doSuggest(request: CompletionRequest, provider: CompletionProvider) : Suggestion[] {
@@ -1086,7 +1134,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
             if (!x.range().hasValueTypeInHierarchy()&&needColon) {
                 complextionText += "\n" + getIndent(offset, text) + "  ";
             }
-            return {text: complextionText, displayText: x.nameId(), description: x.description()}
+            return {text: complextionText, displayText: x.nameId(), description: x.description(), category: categoryByRanges(x.nameId(), node.definition(), x.range())}
         });
     }
     if (c) {
@@ -1130,6 +1178,8 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                 }
                 if (oftenKeys) {
                     oftenKeys.forEach(y=> {
+                        var original = y;
+                        
                         var cs=prop.valueDocProvider();
                         var description=""
                         if (cs){
@@ -1140,7 +1190,8 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                                 text: y + ":" + "\n" + getIndent(offset, text) + "  ",
                                 description: description,
                                 displayText: y,
-                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null
+                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null,
+                                category: categoryByRanges(original, hlnode.definition(), prop.range())
                             })
                         }
                         else{
@@ -1148,7 +1199,8 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                                 text: y ,
                                 description: description,
                                 displayText: y,
-                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null
+                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null,
+                                category: categoryByRanges(original, hlnode.definition(), prop.range())
                             })
                         }
                     });
@@ -1419,10 +1471,14 @@ function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IH
             var subTypes = search.subTypesWithLocals(property.domain(), parentNode);
 
             return subTypes.map(subType => {
+                var suggestionText = (<def.NodeClass>subType).getAdapter(services.RAMLService).descriminatorValue();
+                
                 return {
-                    text: (<def.NodeClass>subType).getAdapter(services.RAMLService).descriminatorValue(),
+                    text: suggestionText,
 
-                    description: (<def.NodeClass>subType).description()
+                    description: (<def.NodeClass>subType).description(),
+                    
+                    category: categoryByRanges(suggestionText, property.domain(), null)
                 }
             });
         }
@@ -1469,7 +1525,8 @@ function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IH
 
     return <Suggestion[]>search.enumValues(property,parentNode).map(proposed => {
         return {
-            text: proposed
+            text: proposed,
+            category: categoryByRanges(proposed, parentNode && parentNode.definition(), null)
         }
     });
 }

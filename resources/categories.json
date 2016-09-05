@@ -1,0 +1,95 @@
+{
+  "docs" : {
+    "description": {"is": ["Universe10.MarkdownString", "Universe08.MarkdownString"]},
+    "displayName": {"parentIs": ["Universe10.ExampleSpec","Universe10.TypeDeclaration","Universe10.Trait","Universe10.MethodBase","Universe10.AbstractSecurityScheme","Universe10.ResourceType","Universe10.Resource","Universe08.Parameter","Universe08.Resource","Universe08.ResourceType","Universe08.Trait"]},
+    "example": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter","Universe08.BodyLike","Universe08.XMLBody","Universe08.JSONBody"]},
+    "usage": {"parentIs": ["Universe10.Library","Universe10.Overlay","Universe10.Extension","Universe10.Trait","Universe10.ResourceType","Universe08.ResourceType","Universe08.Trait"]},
+    "content": {"parentIs": ["Universe10.DocumentationItem","Universe08.DocumentationItem"]},
+    "documentation": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "title": {"parentIs": ["Universe10.DocumentationItem", "Universe08.DocumentationItem"]}
+  },
+
+  "parameters": {
+    "default": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "enum": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "maximum": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "minimum": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "maxLength": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "minLength": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "required": {"parentIs": ["Universe10.TypeDeclaration","Universe08.Parameter"]},
+    "baseUriParameters" : {"parentIs":["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api","Universe08.Resource","Universe08.ResourceType","Universe08.MethodBase","Universe08.Trait","Universe08.AbstractSecurityScheme"]},
+    "uriParameters": {"parentIs": ["Universe10.ResourceType","Universe10.ResourceBase","Universe10.Resource","Universe08.Api","Universe08.Resource","Universe08.ResourceType"]},
+    "headers": {"parentIs": ["Universe10.Response","Universe10.Trait","Universe10.MethodBase","Universe10.Operation","Universe10.AbstractSecurityScheme","Universe08.Response","Universe08.MethodBase","Universe08.Trait","Universe08.AbstractSecurityScheme"]},
+    "queryParameters": {"parentIs": ["Universe10.Trait","Universe10.MethodBase","Universe10.Operation","Universe10.AbstractSecurityScheme","Universe08.MethodBase","Universe08.Trait","Universe08.AbstractSecurityScheme"]},
+    "type": {"parentIs": ["Universe08.Parameter"]}
+  },
+
+  "schemas": {
+    "schema": {"parentIs": ["Universe10.TypeDeclaration","Universe08.BodyLike","Universe08.XMLBody","Universe08.JSONBody"]},
+    "schemas": {"parentIs": ["Universe10.Library","Universe10.LibraryBase","Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]}
+  },
+
+  "root": {
+    "baseUri": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "mediaType": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "protocols": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe10.Trait","Universe10.MethodBase","Universe08.Api","Universe08.MethodBase","Universe08.Trait","Universe08.AbstractSecurityScheme"]},
+    "version": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "title": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]}
+  },
+
+  "responses": {
+    "responses": {"parentIs": ["Universe10.Trait","Universe10.MethodBase","Universe10.Operation","Universe10.AbstractSecurityScheme","Universe08.MethodBase","Universe08.Trait","Universe08.AbstractSecurityScheme"]}
+  },
+
+  "response": {"body": {"parentIs":["Universe10.Response", "Universe08.Response"]}},
+
+  "body": {"body": {"parentIs":["Universe10.MethodBase","Universe08.MethodBase"]}},
+
+  "security" : {
+    "securedBy": {"is": ["Universe10.SecuritySchemeRef","Universe08.SecuritySchemeRef"]},
+    "securitySchemes": {"parentIs": ["Universe10.Library","Universe10.LibraryBase","Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "accessTokenUri": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "authorizationGrants": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "authorizationUri": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "requestTokenUri": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "scopes": {"parentIs": ["Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "describedBy": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "settings": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "OAuth 1.0": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "OAuth 2.0": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "Basic Authentication": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "Digest Authentication": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]},
+    "type": {"parentIs": ["Universe10.AbstractSecurityScheme","Universe08.AbstractSecurityScheme"]}
+  },
+
+  "types and traits": {
+    "type" : {"parentIs" : ["Universe10.ResourceType","Universe10.ResourceBase","Universe10.Resource","Universe08.Resource","Universe08.ResourceType"]},
+    "is": {"is": ["Universe10.TraitRef","Universe08.TraitRef"]},
+    "resourceTypes": {"parentIs": ["Universe10.Library","Universe10.LibraryBase","Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
+    "traits": {"parentIs": ["Universe10.Library","Universe10.LibraryBase","Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]}
+  },
+
+  "methods" : {
+    "options": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "get": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "head": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "post": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "put": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "delete": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "trace": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "connect": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "patch": {"is": ["Universe10.MethodBase", "Universe08.MethodBase"]}
+  },
+
+  "protocols": {
+    "HTTP": {"parentIs": ["Universe10.MethodBase", "Universe08.MethodBase"]},
+    "HTTPS": {"parentIs": ["Universe10.MethodBase", "Universe08.MethodBase"]}
+  },
+
+  "body": {
+    "application/json": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
+    "application/x-www-form-urlencoded": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
+    "application/xml": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
+    "multipart/form-data": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]}
+  }
+}
