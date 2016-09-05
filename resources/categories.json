@@ -43,8 +43,6 @@
 
   "response": {"body": {"parentIs":["Universe10.Response", "Universe08.Response"]}},
 
-  "body": {"body": {"parentIs":["Universe10.MethodBase","Universe08.MethodBase"]}},
-
   "security" : {
     "securedBy": {"is": ["Universe10.SecuritySchemeRef","Universe08.SecuritySchemeRef"]},
     "securitySchemes": {"parentIs": ["Universe10.Library","Universe10.LibraryBase","Universe10.Api","Universe10.Overlay","Universe10.Extension","Universe08.Api"]},
@@ -90,6 +88,7 @@
     "application/json": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
     "application/x-www-form-urlencoded": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
     "application/xml": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
-    "multipart/form-data": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]}
+    "multipart/form-data": {"parentIs": ["Universe10.TypeDeclaration", "Universe08.BodyLike"]},
+    "body": {"parentIs":["Universe10.MethodBase","Universe08.MethodBase"]}
   }
 }
