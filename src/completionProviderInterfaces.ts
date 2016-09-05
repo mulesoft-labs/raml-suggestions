@@ -113,6 +113,11 @@ export interface Suggestion {
      * Detected suggestion prefix.
      */
     prefix?: string
+
+    /**
+     * Suggestion category.
+     */
+    category?: string
 }
 
 /**
