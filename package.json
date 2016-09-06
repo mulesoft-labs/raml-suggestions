@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc",
+    "browserify" : "browserify ./dist/browser-main.js -o ./dist/raml-suggestions.js;",
     "test-cov": " ./node_modules/.bin/istanbul cover _mocha dist/test/*Tests.js"
   },
   "repository": {
@@ -22,6 +23,15 @@
     "mocha": "^2.2.1",
     "istanbul": "^0.4.2",
     "typescript": "1.8.7",
-    "rimraf": "*"
+    "rimraf": "*",
+    "browserify-global-shim": "^1.0.3"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-global-shim"
+    ]
+  },
+  "browserify-global-shim": {
+    "raml-1-parser": "RAML.Parser"
   }
 }
