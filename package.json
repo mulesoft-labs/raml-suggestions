@@ -3,7 +3,8 @@
   "version": "0.0.15",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rimraf dist && tsc; browserify ./dist/browser-main.js -o ./dist/raml-suggestions.js;",
+    "build": "rimraf dist && tsc",
+    "browserify" : "browserify ./dist/browser-main.js -o ./dist/raml-suggestions.js;",
     "test-cov": " ./node_modules/.bin/istanbul cover _mocha dist/test/*Tests.js"
   },
   "repository": {

@@ -1,2 +1,2 @@
-window['RAML'] = window['RAML'] || {};
-window['RAML'].Suggestions = require('./index');
+(<any>window)[<any>'RAML'] = window[<any>'RAML'] || {};
+(<any>window)[<any>'RAML'].Suggestions = require('./index');
