@@ -5,7 +5,11 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "browserify" : "browserify ./dist/browser-main.js -o ./dist/raml-suggestions.js;",
-    "test-cov": " ./node_modules/.bin/istanbul cover _mocha dist/test/*Tests.js"
+    "test-cov": " ./node_modules/.bin/istanbul cover _mocha dist/test/*Tests.js",
+    "pullall" : "dev-env-installer pullall",
+    "buildall" : "dev-env-installer buildall",
+    "testall" : "dev-env-installer testall",
+    "devInstall": "dev-env-installer install"
   },
   "repository": {
     "type": "git",
@@ -24,7 +28,8 @@
     "istanbul": "^0.4.2",
     "typescript": "1.8.7",
     "rimraf": "*",
-    "browserify-global-shim": "^1.0.3"
+    "browserify-global-shim": "^1.0.3",
+    "dev-env-installer":"0.0.5"
   },
   "browserify": {
     "transform": [

@@ -1,0 +1,55 @@
+{
+  "raml-actions" : {
+    "build" : "npm run build",
+    "gitUrl" : "https://github.com/mulesoft/raml-actions.git",
+    "installTypings" : true
+  },
+  "raml-suggestions" : {
+    "build" : "npm run build",
+    "test" : "npm run test-cov",
+    "gitUrl" : "https://github.com/mulesoft/raml-suggestions.git",
+    "gitBranch" : false,
+    "installTypings" : true
+  },
+  "raml-1-parser" : {
+    "build" : "npm run build",
+    "test" : "gulp test",
+    "gitUrl" : "https://github.com/raml-org/raml-js-parser-2.git",
+    "gitBranch" : "develop",
+    "installTypings" : true
+  },
+  "raml-definition-system" : {
+    "build" : "npm run build",
+    "gitUrl" : "https://github.com/raml-org/raml-definition-system.git",
+    "gitBranch" : "develop",
+    "installTypings" : true
+  },
+  "raml-typesystem" : {
+    "build" : "npm run build",
+    "test" : "npm run test-cov",
+    "gitUrl" : "https://github.com/raml-org/typesystem-ts.git",
+    "gitBranch" : "develop",
+    "installTypings" : true
+  },
+  "ts-structure-parser" : {
+    "build" : "npm run build",
+    "gitUrl" : "https://github.com/mulesoft-labs/ts-structure-parser.git",
+    "gitBranch" : "develop",
+    "installTypings" : true
+  },
+  "yaml-ast-parser" : {
+    "build" : "npm run build",
+    "gitUrl" : "https://github.com/mulesoft-labs/yaml-ast-parser.git",
+    "gitBranch" : "develop"
+  },
+  "ts-model" : {
+    "build" : "npm run build",
+    "gitUrl" : "https://github.com/mulesoft-labs/ts-model.git",
+    "installTypings" : true
+  },
+  "atom-ui-lib" : {
+    "build" : "npm run build",
+    "gitUrl" : "https://github.com/mulesoft-labs/ui-libs.git",
+    "installTypings" : true
+  }
+}
