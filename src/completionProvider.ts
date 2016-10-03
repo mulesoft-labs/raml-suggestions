@@ -1341,7 +1341,23 @@ function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IH
 
             var typeProperties = parentNode.children() && parentNode.children().filter(child => child.isAttr() && parserApi.universeHelpers.isTypeProperty(child.property()));
 
+            var visibleScopes: string[] = [];
+
+            var api: any = parentNode && parentNode.root && parentNode.root();
+
+            api &&  api.lowLevel() &&  api.lowLevel().unit() && visibleScopes.push(api.lowLevel().unit().absolutePath());
+
+            api && api.wrapperNode && api.wrapperNode() && api.wrapperNode().uses && api.wrapperNode().uses().forEach((usesDeclaration: any) => {
+                usesDeclaration && usesDeclaration.value && usesDeclaration.value() && visibleScopes.push(api.lowLevel().unit().resolve(usesDeclaration.value()).absolutePath());
+            })
+
             var definitionNodes = parserApi.search.globalDeclarations(parentNode).filter(node => {
+                var nodeLocation = node.lowLevel().unit().absolutePath();
+
+                if(visibleScopes.indexOf(nodeLocation) < 0) {
+                    return false;
+                }
+
                 if(parserApi.universeHelpers.isGlobalSchemaType(node.definition())) {
                     return true;
                 }
