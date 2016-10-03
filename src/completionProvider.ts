@@ -1131,7 +1131,9 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     if (!mv&&!onlyKey) {
         rs=props.map(x=> {
             var complextionText = x.nameId() + ks;
-            if (!x.range().hasValueTypeInHierarchy()&&needColon) {
+            if(x.range().isAssignableFrom(universeModule.Universe10.ExampleSpec.name)) {
+                complextionText = complextionText.trim();
+            } else if(!x.range().hasValueTypeInHierarchy() && needColon) {
                 complextionText += "\n" + getIndent(offset, text) + "  ";
             }
             return {text: complextionText, displayText: x.nameId(), description: x.description(), category: categoryByRanges(x.nameId(), node.definition(), x.range())}
