@@ -1,9 +1,10 @@
 {
   "name": "raml-suggestions",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc",
+    "generateBrowserVersion": "node dist/browserVersionGenerator/browserVersionGenerator.js",
     "browserify" : "browserify ./dist/browser-main.js -o ./dist/raml-suggestions.js;",
     "test-cov": " ./node_modules/.bin/istanbul cover _mocha dist/test/*Tests.js",
     "pullall" : "dev-env-installer pullall",
@@ -18,7 +19,7 @@
   "typings": "./dist/index.d.ts",
   "dependencies": {
     "underscore": "^1.8.3",
-    "raml-1-parser": "1.1.1",
+    "raml-1-parser": "1.1.4",
     "fuzzaldrin-plus": "^0.3.1"
   },
   "devDependencies": {
@@ -26,10 +27,13 @@
     "chai-as-promised": "^5.2.0",
     "mocha": "^2.2.1",
     "istanbul": "^0.4.2",
+    "mkdirp": "^0.5.0",
     "typescript": "1.8.7",
     "rimraf": "*",
     "browserify-global-shim": "^1.0.3",
-    "dev-env-installer":"0.0.5"
+    "dev-env-installer":"0.0.5",
+    "webpack": "1.4.2",
+    "json-loader": "^0.5.1"
   },
   "browserify": {
     "transform": [

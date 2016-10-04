@@ -1131,7 +1131,9 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     if (!mv&&!onlyKey) {
         rs=props.map(x=> {
             var complextionText = x.nameId() + ks;
-            if (!x.range().hasValueTypeInHierarchy()&&needColon) {
+            if(x.range().isAssignableFrom(universeModule.Universe10.ExampleSpec.name)) {
+                complextionText = complextionText.trim();
+            } else if(!x.range().hasValueTypeInHierarchy() && needColon) {
                 complextionText += "\n" + getIndent(offset, text) + "  ";
             }
             return {text: complextionText, displayText: x.nameId(), description: x.description(), category: categoryByRanges(x.nameId(), node.definition(), x.range())}
@@ -1339,7 +1341,23 @@ function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IH
 
             var typeProperties = parentNode.children() && parentNode.children().filter(child => child.isAttr() && parserApi.universeHelpers.isTypeProperty(child.property()));
 
+            var visibleScopes: string[] = [];
+
+            var api: any = parentNode && parentNode.root && parentNode.root();
+
+            api &&  api.lowLevel() &&  api.lowLevel().unit() && visibleScopes.push(api.lowLevel().unit().absolutePath());
+
+            api && api.wrapperNode && api.wrapperNode() && api.wrapperNode().uses && api.wrapperNode().uses().forEach((usesDeclaration: any) => {
+                usesDeclaration && usesDeclaration.value && usesDeclaration.value() && visibleScopes.push(api.lowLevel().unit().resolve(usesDeclaration.value()).absolutePath());
+            })
+
             var definitionNodes = parserApi.search.globalDeclarations(parentNode).filter(node => {
+                var nodeLocation = node.lowLevel().unit().absolutePath();
+
+                if(visibleScopes.indexOf(nodeLocation) < 0) {
+                    return false;
+                }
+
                 if(parserApi.universeHelpers.isGlobalSchemaType(node.definition())) {
                     return true;
                 }
