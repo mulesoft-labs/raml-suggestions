@@ -181,9 +181,6 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
                         preParsedAst: parserApi.hl.IParseResult = undefined): Suggestion[] {
     provider.currentRequest = request;
 
-    var line = getLine(request);
-    var pr = getPrefix(request);
-
     try {
         if(provider.level > 100){
             return;
@@ -694,6 +691,14 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
 
     if(!allowNull && !astNode){
         return ast;
+    }
+
+    if(search.isExampleNode(astNode) && !astNode.value()) {
+        var exampleEnd = astNode.lowLevel().end();
+
+        if(text[exampleEnd] === '\n') {
+            astNode = astNode.parent();
+        }
     }
 
     return astNode;
