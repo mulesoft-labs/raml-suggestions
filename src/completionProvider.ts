@@ -693,7 +693,7 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
         return ast;
     }
 
-    if(search.isExampleNode(astNode)) {
+    if(astNode && search.isExampleNode(astNode)) {
         var exampleEnd = astNode.lowLevel().end();
 
         if(exampleEnd === actualOffset && text[exampleEnd] === '\n') {
