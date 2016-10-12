@@ -693,6 +693,14 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
         return ast;
     }
 
+    if(search.isExampleNode(astNode)) {
+        var exampleEnd = astNode.lowLevel().end();
+
+        if(exampleEnd === actualOffset && text[exampleEnd] === '\n') {
+            astNode = astNode.parent();
+        }
+    }
+
     return astNode;
 }
 
@@ -1213,11 +1221,75 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     return rs;
 }
 
-export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi.hl.IAttribute, request: CompletionRequest, provider: CompletionProvider){
+function isUnexspected(symbol: string): boolean {
+    if(symbol === "'") {
+        return true;
+    }
+
+    if(symbol === '"') {
+        return true;
+    }
+    
+    return false;
+}
+
+function isValueBroken(request: CompletionRequest) {
+    var text = request.content.getText();
+    var offset = request.content.getOffset();
+    var prefix = request.prefix();
+
+    var beginning = text.substring(0, offset);
+    
+    var value = beginning.substring(beginning.lastIndexOf(':') + 1).trim();
+    
+    if(!value.length) {
+        return false;
+    }
+    
+    if(value[value.length - 1] === ',') {
+        if(value.indexOf('[') < 0) {
+            return true;
+        }
+    }
+    
+    if(beginning[beginning.length - 1] === ' ') {
+        if(/^\w$/.test(value[value.length - 1])) {
+            return true;
+        } else if(value[value.length - 1] === ',') {
+            if(value.indexOf('[') < 0) {
+                return true;
+            }
+        }
+    }
+    
+    if(/^\w+$/.test(prefix)) {
+        value = value.substring(0, value.lastIndexOf(prefix)).trim();
+
+        if(/^\w$/.test(value[value.length - 1])) {
+            return true;
+        } else if(value[value.length - 1] === ',') {
+            if(value.indexOf('[') < 0) {
+                return true;
+            }
+        }
+    }
+    
+    if(isUnexspected(value[value.length - 1])) {
+        return true;
+    }
+
+    return false;
+}
+
+export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi.hl.IAttribute, request: CompletionRequest, provider: CompletionProvider) {
     var hlnode = <parserApi.hl.IHighLevelNode>node;
 
     var text = request.content.getText();
     var offset = request.content.getOffset();
+
+    if(isValueBroken(request)) {
+        return [];
+    }
 
     if(attr) {
         var p: parserApi.hl.IProperty = attr.property();
@@ -1329,6 +1401,8 @@ function findASTNodeByOffset(ast : parserApi.hl.IHighLevelNode, request: Complet
 function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IHighLevelNode): Suggestion[] {
     if(parentNode) {
         if(property.getAdapter(parserApi.ds.RAMLPropertyService).isTypeExpr()) {
+
+
             var associatedType = parentNode.associatedType();
 
             var parentDefinition = parentNode.definition();
