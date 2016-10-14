@@ -168,6 +168,10 @@ describe("Basic completion tests", function() {
         testCompletionByEntryEnd('basic/test26.raml', '\n        des', 'description');
     });
 
+    it("Multiple Examples Properties For Sequences", function () {
+        testCompletionByEntryEnd('basic/test42.raml', "\n        - dr", 'drinkID, drinkName, drinkTemp');
+    });
+
     it("minLength facet completion", function () {
         testCompletionByEntryEnd('basic/test19.raml', '\n        minLen', 'minLength');
     });

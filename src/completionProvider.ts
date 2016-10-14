@@ -1136,7 +1136,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
 
     //TODO MAKE IT BETTER (actually we need to filter out and guess availabe keys)
     var rs : Suggestion[]=[];
-    if (!mv&&!onlyKey) {
+    if (!mv) {
         rs=props.map(x=> {
             var complextionText = x.nameId() + ks;
             if(x.range().isAssignableFrom(universeModule.Universe10.ExampleSpec.name)) {

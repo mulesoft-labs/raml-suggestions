@@ -1,0 +1,28 @@
+#%RAML 1.0
+title: test API
+
+types:
+  Bean:
+    properties:
+      id: string
+      name: string
+      originRegion: string
+      originCountry: string
+      idealDrinks:
+        type: array
+        items: IdealDrink
+    example:
+      id: "001"
+      name: "Arid Aribica"
+      originRegion: "Latin America"
+      originCountry: "Columbia"
+      idealDrinks:
+        - dr
+        - drinkID: "100"
+          drinkName: ""
+          drinkTemp: ""
+  IdealDrink:
+    properties:
+      drinkID: string
+      drinkName: string
+      drinkTemp: string
