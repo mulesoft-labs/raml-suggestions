@@ -6,6 +6,14 @@ import assert = chai.assert;
 import testApi = require('./completionTestApi');
 
 describe("Basic completion tests", function() {
+    it("test0", function () {
+        testCompletionByEntryEnd('basic/LibraryExample/slack.raml', 'CH11\n    ', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, displayName, properties, get, put, post, delete, options, head, patch');
+    });
+    
+    it("test1", function () {
+        testCompletionByEntryEnd('basic/test1.raml', 'juan: s', 'string, SimpleType1, SimpleType2, SimpleType');
+    });
+
     it("test1", function () {
         testCompletionByEntryEnd('basic/test1.raml', 'juan: s', 'string, SimpleType1, SimpleType2, SimpleType');
     });
