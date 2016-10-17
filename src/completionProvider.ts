@@ -178,7 +178,7 @@ function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider
 }
 
 function getSuggestions(request: CompletionRequest, provider: CompletionProvider,
-                        preParsedAst: parserApi.hl.IParseResult = undefined): Suggestion[] {
+                        preParsedAst: parserApi.hl.IParseResult = undefined, project?: parserApi.ll.IProject): Suggestion[] {
     provider.currentRequest = request;
 
     try {
@@ -194,7 +194,7 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
 
         var kind = completionKind(request);
 
-        var node: parserApi.hl.IHighLevelNode = <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider));
+        var node: parserApi.hl.IHighLevelNode = <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider, true, true, project));
 
         var hlnode: parserApi.hl.IHighLevelNode = node;
 
@@ -654,10 +654,10 @@ function completionKind(request: CompletionRequest) {
     return parserApi.search.determineCompletionKind(request.content.getText(), request.content.getOffset());
 }
 
-function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, clearLastChar: boolean = true, allowNull: boolean = true): parserApi.hl.IParseResult {
+function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, clearLastChar: boolean = true, allowNull: boolean = true, oldProject?: parserApi.ll.IProject): parserApi.hl.IParseResult {
     var newProjectId: string = contentProvider.contentDirName(request.content);
 
-    var project: any = parserApi.project.createProject(newProjectId, <FSResolverExt>(<any>contentProvider).fsResolver);
+    var project: any = oldProject || parserApi.project.createProject(newProjectId, <FSResolverExt>(<any>contentProvider).fsResolver);
 
     var offset = request.content.getOffset();
 
@@ -1889,8 +1889,10 @@ function examplePropertyCompletion(node: any, request:CompletionRequest, provide
 
     var parsedExample = search.parseStructuredExample(node, contentType);
     if (!parsedExample) return [];
+    
+    var project = node && node.lowLevel() && node.lowLevel().unit() && node.lowLevel().unit().project();
 
-    return getSuggestions(request, provider, findASTNodeByOffset(parsedExample, request))
+    return getSuggestions(request, provider, findASTNodeByOffset(parsedExample, request), project)
 }
 
 export function postProcess(providerSuggestions: any, request: CompletionRequest) {
