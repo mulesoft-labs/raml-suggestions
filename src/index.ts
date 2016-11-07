@@ -7,6 +7,11 @@ import completionProviderInterfaces = require('./completionProviderInterfaces');
 export type IEditorStateProvider = completionProviderInterfaces.IEditorStateProvider;
 
 /**
+ * AST provider.
+ */
+export type IASTProvider = completionProviderInterfaces.IASTProvider;
+
+/**
  * Provides virtual file system data
  */
 export type IFSProvider = completionProviderInterfaces.IFSProvider;
@@ -33,12 +38,22 @@ export type FSResolverExt = completionProviderInterfaces.FSResolverExt;
 
 var _editorStateProvider: IEditorStateProvider = null;
 
+var _astProvider: IASTProvider = null;
+
 /**
  * Sets default editor state provider
  * @param editorStateProvider
  */
 export function setDefaultEditorStateProvider(editorStateProvider: IEditorStateProvider) : void {
     _editorStateProvider = editorStateProvider;
+}
+
+/**
+ * Sets default AST provider
+ * @param astProvider
+ */
+export function setDefaultASTProvider(astProvider: IASTProvider) : void {
+    _astProvider = astProvider;
 }
 
 var _fsProvider: IFSProvider = null;

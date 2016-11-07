@@ -13,6 +13,7 @@ import _ = require("underscore");
 
 import {IFSProvider} from "./completionProviderInterfaces";
 import {IEditorStateProvider} from "./completionProviderInterfaces";
+import {IASTProvider} from "./completionProviderInterfaces";
 import {FSResolverExt} from "./completionProviderInterfaces";
 import {Suggestion} from "./completionProviderInterfaces";
 
@@ -66,9 +67,11 @@ export class CompletionProvider {
 
     currentRequest : CompletionRequest = null;
 
+    astProvider: IASTProvider = null;
+
     level: number = 0;
 
-    constructor(contentProvider: IFSProvider) {
+    constructor(contentProvider: IFSProvider, astProvider: IASTProvider = null) {
         this.contentProvider = contentProvider;
     }
 
@@ -83,9 +86,9 @@ export class CompletionProvider {
     }
 }
 
-export function suggest(editorState: IEditorStateProvider, fsProvider: IFSProvider) : Suggestion[] {
+export function suggest(editorState: IEditorStateProvider, fsProvider: IFSProvider, astProvider: IASTProvider = null) : Suggestion[] {
     var completionRequest = new CompletionRequest(editorState);
-    var completionProvider = new CompletionProvider(fsProvider);
+    var completionProvider = new CompletionProvider(fsProvider, astProvider);
 
     return completionProvider.suggest(completionRequest, true);
 }
@@ -144,7 +147,13 @@ function isRangeAssignable(type: services.ITypeDefinition, defCode: string) {
 }
 
 function doSuggest(request: CompletionRequest, provider: CompletionProvider) : Suggestion[] {
-    var result = getSuggestions(request, provider);
+    var preParsedAST : parserApi.hl.IParseResult = null;
+
+    if (provider.astProvider) {
+        preParsedAST = provider.astProvider.getASTRoot();
+    }
+
+    var result = getSuggestions(request, provider, preParsedAST);
     if (result) return result;
     return [];
 }
@@ -194,7 +203,8 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
 
         var kind = completionKind(request);
 
-        var node: parserApi.hl.IHighLevelNode = <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider, true, true, project));
+        var node: parserApi.hl.IHighLevelNode = null;
+        <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider, true, true, project));
 
         var hlnode: parserApi.hl.IHighLevelNode = node;
 
