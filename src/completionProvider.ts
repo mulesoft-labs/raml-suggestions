@@ -203,8 +203,8 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
 
         var kind = completionKind(request);
 
-        var node: parserApi.hl.IHighLevelNode = null;
-        <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider, true, true, project));
+        var node: parserApi.hl.IHighLevelNode =
+            <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider, true, true, project));
 
         var hlnode: parserApi.hl.IHighLevelNode = node;
 
