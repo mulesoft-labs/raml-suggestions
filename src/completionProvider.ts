@@ -826,7 +826,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
 
     var dn: string | Promise<string> = contentProvider.contentDirName(request.content);
 
-    var ll = contentProvider.resolve(<string>dn, prefix);
+    var ll = contentProvider.resolve(<string>dn, prefix.indexOf('/') === 0 ? ('.' + prefix) : prefix);
     
     var indexOfDot = ll.lastIndexOf('.');
 
