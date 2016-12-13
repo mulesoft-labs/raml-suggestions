@@ -587,6 +587,10 @@ describe("Basic completion tests", function() {
     it("Typed Fragments: Extension node 'extends'", function () {
         testCompletionByEntryEnd('basic/test41.raml', '\next', 'extends');
     });
+
+    it("test43", function () {
+        testCompletionByEntryEnd('basic/test43.raml', 'X', 'XKCD');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {

@@ -585,6 +585,10 @@ describe("Async completion tests", function() {
     it("Typed Fragments: Extension node 'extends'", function (done) {
         testCompletionByEntryEnd('basic/test41.raml', done, '\next', 'extends');
     });
+
+    it("test43", function (done) {
+        testCompletionByEntryEnd('basic/test43.raml', done, 'X', 'XKCD');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {
