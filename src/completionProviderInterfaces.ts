@@ -1,3 +1,6 @@
+export import parser=require("raml-1-parser");
+import hl=parser.hl;
+
 /**
  * Editor state provider.
  */
@@ -22,6 +25,24 @@ export interface IEditorStateProvider {
      * Editor cursor offset.
      */
     getOffset(): number;
+}
+
+/**
+ * Provides current AST state.
+ * If set via setASTProvider method, will be used instead of a new AST calculation
+ * by parsing the text provided by IEditorProvider.
+ */
+export interface IASTProvider {
+
+    /**
+     * Gets current AST root.
+     */
+    getASTRoot() : hl.IHighLevelNode;
+
+    /**
+     * Gets current AST node
+     */
+    getSelectedNode() : hl.IParseResult;
 }
 
 /**
