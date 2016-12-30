@@ -19,7 +19,7 @@
   "typings": "./dist/index.d.ts",
   "dependencies": {
     "underscore": "^1.8.3",
-    "raml-1-parser": "1.1.6",
+    "raml-1-parser": "1.1.11",
     "fuzzaldrin-plus": "^0.3.1"
   },
   "devDependencies": {
