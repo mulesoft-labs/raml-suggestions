@@ -1081,6 +1081,48 @@ function isAllowed(node: parserApi.hl.IHighLevelNode, x: parserApi.hl.IProperty)
     return ok;
 }
 
+/**
+ * Returns true if property should be left in the completion proposals, false if the property should be removed
+ * @param node
+ * @param property
+ * @param existing
+ */
+function filterPropertyCompletion(node: parserApi.hl.IHighLevelNode, property: parserApi.hl.IProperty,
+    existing:{[name:string]:boolean}) : boolean {
+
+    //basic filtering
+    if (!(!property.getAdapter(parserApi.ds.RAMLPropertyService).isKey() && !property.getAdapter(parserApi.ds.RAMLPropertyService).isMerged()&&!property.getAdapter(services.RAMLPropertyService).isSystem())) {
+        return false;
+    }
+
+    //contextual filtering
+    if (!(isAllowed(node,property))) {
+        return false;
+    }
+
+    //duplicate filtering
+    if (!(!existing[property.nameId()])) {
+        return false;
+    }
+
+    //annotation filtering
+    if (!(!(<def.Property>property).isAnnotation())) {
+        return false;
+    }
+
+    if (
+        property.nameId() == parserApi.universes.Universe10.TypeDeclaration.properties.allowedTargets.name &&
+        property.domain().key() &&
+        property.domain().key() == parserApi.universes.Universe10.TypeDeclaration &&
+        !node.localType().isAnnotationType()
+    ) {
+
+        return false;
+    }
+
+    return true;
+}
+
 function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: CompletionRequest, mv:boolean, c:boolean, hasNewLine: boolean = true) {
     var hlnode = node;
     var notAKey=false;
@@ -1122,16 +1164,14 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     var ks = needColon ? ": " : "";
 
     var props = hlnode.definition().allProperties();
-    //basic filtering
-    props = props.filter(x=>!x.getAdapter(parserApi.ds.RAMLPropertyService).isKey() && !x.getAdapter(parserApi.ds.RAMLPropertyService).isMerged()&&!x.getAdapter(services.RAMLPropertyService).isSystem());
-    //contextual filtering
-    props =props.filter(x=>isAllowed(hlnode,x))
+
     var existing:{[name:string]:boolean} = {};
     hlnode.attrs().forEach(x=> {
         existing[x.name()] = true;
     });
 
-    props = props.filter(x=>!existing[x.nameId()]).filter(x=>!(<def.Property>x).isAnnotation());
+    props = props.filter(x=>filterPropertyCompletion(hlnode,x, existing))
+
     if (node.definition().isAssignableFrom(parserApi.universes.Universe10.TypeDeclaration.name)){
         if (!node.definition().isAssignableFrom("ObjectTypeDeclaration")){
             if (!node.attr("type")){
