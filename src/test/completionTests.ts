@@ -579,6 +579,294 @@ describe("Basic completion tests", function() {
     it("Typed Fragments: Extension node 'extends'", function () {
         testCompletionByEntryEnd('basic/test41.raml', '\next', 'extends');
     });
+
+    it("Reference completion for a property definition", function () {
+        testCompletionByEntryStart('basic/test3.raml', 'string', 'TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+    });
+
+    it("Reference completion for a type definition", function () {
+        testCompletionByEntryStart('basic/test5.raml', 'object', 'array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+    });
+
+    it("Reference completion for a type shortcut definition", function () {
+        testCompletionByEntryStart('basic/test6.raml', 'boolean', 'Define Inline, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+    });
+
+    it("Type shortcut definition", function () {
+        testCompletionByEntryStart('basic/test7.raml', 'tType\n', 'TestType, TestTypeUnion, TestTypePrimitive, TestType2, TestTypeWithInheritance');
+    });
+
+    it("Custom facets.", function () {
+        testCompletionByEntryStart('basic/test25.raml', 'Holidays: true', 'noHolidays, notOnlyFutureDates');
+    });
+
+    it("Resource type with parameters reference completion", function () {
+        testCompletionByEntryStart('basic/test42.raml', 'stResource\n', 'TestResorceType');
+    });
+
+    it("Resource type parameter value reference completion.", function () {
+        testCompletionByEntryStart('basic/test42.raml', 'tSchema} }', 'TestSchema');
+    });
+
+    it("Function singularize", function () {
+        testCompletionByEntryStart('basic/test43.raml', 'larize>>', 'singularize');
+    });
+
+    it("Function pluralize", function () {
+        testCompletionByEntryStart('basic/test43.raml', 'uralize>>', 'pluralize');
+    });
+
+    it("Include folders names", function () {
+        testCompletionByEntryStart('basic/test44.raml', 'chemas/comic-schema.json', 'schemas');
+    });
+
+    it("Include file name", function () {
+        testCompletionByEntryStart('basic/test44.raml', 'ic-schema.json', 'comic-schema.json');
+    });
+
+    it("Inherited type example completion", function () {
+        testCompletionByEntryStart('basic/test53.raml', 'pe: user', 'type');
+    });
+
+    it("Inherited type multiple examples properties completion", function () {
+        testCompletionByEntryStart('basic/test53.raml', 'pe: admin', 'type');
+    });
+
+    it("Parameter facet minLength completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'ngth: 4', 'minLength');
+    });
+
+    it("Parameter facet maxLength completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'xLength: 8', 'maxLength');
+    });
+
+    it("Parameter facet example completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'ple: stat', 'example');
+    });
+
+    it("Parameter facet enum completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'num:', 'enum');
+    });
+
+    it("Parameter facet default completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'fault: user', 'default');
+    });
+
+    it("Parameter facet displayName completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'playName:', 'displayName');
+    });
+
+    it("Parameter facet description completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'cription:', 'description');
+    });
+
+    it("Parameter facet required completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'uired: false', 'required');
+    });
+
+    it("Parameter facet repeat completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'peat: false', 'repeat');
+    });
+
+    it("Parameter facet pattern completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'tern: ^[a-zA-Z0-9][-a-zA-Z0-9]*$', 'pattern');
+    });
+
+    it("Parameter facet type completion", function () {
+        testCompletionByEntryStart('basic/test45.raml', 'pe: string', 'type');
+    });
+
+    it("RAML nodes: types, traits, title", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'itle: API SPEC', 'title, traits');
+    });
+
+    it("RAML nodes: description, documentation", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'mentation:', 'documentation');
+    });
+
+    it("RAML node: version", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'ersion: V2', 'version');
+    });
+
+    it("RAML nodes: baseUri, baseUriParameters", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'aseUriParameters:', 'baseUri, baseUriParameters');
+    });
+
+    it("RAML node: protocols", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'otocols:', 'protocols');
+    });
+
+    it("RAML node: mediaType", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'iaType: application/json', 'mediaType');
+    });
+
+    it("RAML nodes: schemas, securitySchemes, securedBy", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'chemas:', 'schemas, securedBy, securitySchemes');
+    });
+
+    it("RAML node resourceTypes", function () {
+        testCompletionByEntryStart('basic/test46.raml', 'ourceTypes:', 'resourceTypes');
+    });
+
+    it("Spec allowed protocols: ", function () {
+        testCompletionByEntryStart('basic/test47.raml', 'TTP', 'HTTP, HTTPS');
+    });
+
+    it("Spec several default media types", function () {
+        testCompletionByEntryStart('basic/test48.raml', 'pplication/json', 'application/json, application/xml, application/x-www-form-urlencoded');
+    });
+
+    it("Request body 'application/xml', 'application/json', 'application/x-www-form-urlencoded' media types", function () {
+        testCompletionByEntryStart('basic/test49.raml', 'ication/x-www-form-urlencoded:', 'application/xml, application/json, application/x-www-form-urlencoded');
+    });
+
+    it("Request body 'multipart/form-data' media type", function () {
+        testCompletionByEntryStart('basic/test49.raml', 'tipart/form-data:', 'multipart/form-data');
+    });
+
+    it("Response body media type", function () {
+        testCompletionByEntryStart('basic/test49.raml', 'ication/json:', 'application/xml, application/json, application/x-www-form-urlencoded');
+    });
+
+    it("Default Spec Security", function () {
+        testCompletionByEntryStart('basic/test48.raml', 'auth_2_0, oauth_1_0 ]', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Resource Security", function () {
+        testCompletionByEntryStart('basic/test48.raml', 'auth_1_0', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Resource Security schemes BUG#2613 FIXME", function () {
+        testCompletionByEntryStart('basic/test48.raml', 'uth_1_0]', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Resource nodes 'description, displayName, delete'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'escription:', 'displayName, description, delete');
+    });
+
+    it("Method 'get:'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'et:', 'get');
+    });
+
+    it("Methods 'put, post, patch'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'ut:', 'put, post, patch');
+    });
+
+    it("Resource 'uriParameters'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'riParameters:', 'uriParameters');
+    });
+
+    it("Method 'options'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'ptions:', 'options');
+    });
+
+    it("Method 'head'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'ead:', 'head');
+    });
+
+    it("Method Security", function () {
+        testCompletionByEntryStart('basic/test48.raml', 'auth_1_0', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Method several Security  BUG#2613 FIXME", function () {
+        testCompletionByEntryStart('basic/test48.raml', 'auth_1_0]', 'oauth_2_0, oauth_1_0');
+    });
+
+    it("Method nodes 'queryString, queryParameters'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'ueryParameters:', 'queryParameters');
+    });
+
+    it("Method request 'headers'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'eaders:', 'headers');
+    });
+
+    it("Method request 'headers' items completion", function () {
+        testCompletionByEntryStart('basic/test50.raml', 't-Modified:', 'Last-Modified, Last-Event-ID');
+    });
+
+    it("Method request 'body'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'ody:', 'body, baseUriParameters');
+    });
+
+    it("Method node 'responses'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'sponses:', 'responses');
+    });
+
+    it("Method node 'protocols'", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'tocols:', 'protocols');
+    });
+
+    it("Response codes", function () {
+        testCompletionByEntryStart('basic/test50.raml', '01:', '100, 101, 102');
+    });
+
+    it("Response body mimeTypes", function () {
+        testCompletionByEntryStart('basic/test50.raml', 'lication/json:', 'application/json, application/xml, application/x-www-form-urlencoded');
+    });
+
+    it("Security Scheme node 'type'", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'pe: x-{other}', 'type');
+    });
+
+    it("Security Scheme 'type' values OAuth 2.0, OAuth 1.0", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'uth 2.0\n', 'OAuth 2.0, OAuth 1.0');
+    });
+
+    it("Security Scheme 'type' value Basic Authentication", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'sic Authentication', 'Basic Authentication');
+    });
+
+    it("Security Scheme 'type' value Digest Authentication", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'est Authentication', 'Digest Authentication');
+    });
+
+    it("Security Scheme 'type' value x-{other}", function () {
+        testCompletionByEntryStart('basic/test51.raml', '-{other}', 'x-{other}');
+    });
+
+    it("Security Scheme node: settings", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'ings', 'settings');
+    });
+
+    it("Oauth 2.0 settings nodes authorizationGrants, accessTokenUri, authorizationUri", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'thorizationGrants: [ authorization_code, password, implicit, client_credentials ]', 'authorizationGrants, accessTokenUri, authorizationUri');
+    });
+
+    it("Oauth 2.0 settings node scopes", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'pes:', 'scopes');
+    });
+
+    it("Security Scheme nodes: description, describedBy", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'ription:', 'description, describedBy');
+    });
+
+    it("Oauth 2.0 describedBy node headers", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'ders:', 'headers');
+    });
+
+    it("Oauth 2.0 describedBy node headers item", function () {
+        testCompletionByEntryStart('basic/test51.raml', '-Frame-Options:', 'X-Frame-Options');
+    });
+
+    it("Oauth 2.0 describedBy node queryParameters", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'yParameters:', 'queryParameters');
+    });
+
+    it("Oauth 2.0 describedBy node responses", function () {
+        testCompletionByEntryStart('basic/test51.raml', 'ponses:', 'responses');
+    });
+
+    it("Oauth 1.0 settings node requestTokenUri", function () {
+        testCompletionByEntryStart('basic/test52.raml', 'uestTokenUri: https://api.dropbox.com/1/oauth/request_token', 'requestTokenUri');
+    });
+
+    it("Oauth 1.0 node authorizationUri", function () {
+        testCompletionByEntryStart('basic/test52.raml', 'horizationUri: https://www.dropbox.com/1/oauth/authorize', 'authorizationUri');
+    });
+
+    it("Oauth 1.0 node tokenCredentialsUri", function () {
+        testCompletionByEntryStart('basic/test52.raml', 'enCredentialsUri: https://api.dropbox.com/1/oauth/access_token', 'tokenCredentialsUri');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
