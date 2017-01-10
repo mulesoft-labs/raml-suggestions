@@ -83,7 +83,7 @@ describe("Basic completion tests", function() {
     it("User-defined types reference completion for a object type inheritance definition. BUG#2609 #2612. FIXME", function () {
         //Correct test
         //testCompletionByEntryEnd('basic/test10.raml', '\n    type: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestType1, TestTypeWithInheritance, TestType2, TestType3');
-        testCompletionByEntryEnd('basic/test10.raml', '\n    type: [PartOne, Tes', 'TestTypeObject, TestType3, TestTypeWithInheritance');
+        testCompletionByEntryEnd('basic/test10.raml', '\n    type: [PartOne, Tes', 'TestTypeObject, TestType1, TestType3, TestTypeWithInheritance');
     });
 
     //this test contains impossible suggestions
@@ -94,7 +94,7 @@ describe("Basic completion tests", function() {
     //this test contains impossible suggestions
     it("User-defined types reference completion for a property inheritance definition. BUG#2612 #2611. FIXME", function () {
         //testCompletionByEntryEnd('basic/test10.raml', '\n        type: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestType1, TestTypeWithInheritance, TestType2, TestType3');
-        testCompletionByEntryEnd('basic/test10.raml', '\n        type: [PartOne, Tes', 'TestTypeObject, TestType2, TestType3, TestTypeWithInheritance');
+        testCompletionByEntryEnd('basic/test10.raml', '\n        type: [PartOne, Tes', 'TestTypeObject, TestType1, TestType2, TestType3, TestTypeWithInheritance');
     });
 
     it("Using Discriminator. BUG#1820 FIXME", function () {
