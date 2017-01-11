@@ -1114,6 +1114,50 @@ function filterPropertyCompletion(node: parserApi.hl.IHighLevelNode, property: p
         property.nameId() == parserApi.universes.Universe10.TypeDeclaration.properties.allowedTargets.name &&
         property.domain().key() &&
         property.domain().key() == parserApi.universes.Universe10.TypeDeclaration &&
+        node.localType() &&
+        !node.localType().isAnnotationType()
+    ) {
+
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Returns true if property should be left in the completion proposals, false if the property should be removed
+ * @param node
+ * @param property
+ * @param existing
+ */
+function filterPropertyCompletion(node: parserApi.hl.IHighLevelNode, property: parserApi.hl.IProperty,
+    existing:{[name:string]:boolean}) : boolean {
+
+    //basic filtering
+    if (!(!property.getAdapter(parserApi.ds.RAMLPropertyService).isKey() && !property.getAdapter(parserApi.ds.RAMLPropertyService).isMerged()&&!property.getAdapter(services.RAMLPropertyService).isSystem())) {
+        return false;
+    }
+
+    //contextual filtering
+    if (!(isAllowed(node,property))) {
+        return false;
+    }
+
+    //duplicate filtering
+    if (!(!existing[property.nameId()])) {
+        return false;
+    }
+
+    //annotation filtering
+    if (!(!(<def.Property>property).isAnnotation())) {
+        return false;
+    }
+
+    if (
+        property.nameId() == parserApi.universes.Universe10.TypeDeclaration.properties.allowedTargets.name &&
+        property.domain().key() &&
+        property.domain().key() == parserApi.universes.Universe10.TypeDeclaration &&
+        node.localType() &&
         !node.localType().isAnnotationType()
     ) {
 
