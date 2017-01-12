@@ -620,14 +620,6 @@ describe("Basic completion tests", function() {
         testCompletionByEntryStart('basic/test42.raml', 'tSchema} }', 'TestSchema');
     });
 
-    it("Function singularize", function () {
-        testCompletionByEntryStart('basic/test43.raml', 'larize>>', 'singularize');
-    });
-
-    it("Function pluralize", function () {
-        testCompletionByEntryStart('basic/test43.raml', 'uralize>>', 'pluralize');
-    });
-
     it("Include folders names", function () {
         testCompletionByEntryStart('basic/test44.raml', 'chemas/comic-schema.json', 'schemas');
     });
@@ -878,6 +870,14 @@ describe("Basic completion tests", function() {
 
     it("Oauth 1.0 node tokenCredentialsUri", function () {
         testCompletionByEntryStart('basic/test52.raml', 'enCredentialsUri: https://api.dropbox.com/1/oauth/access_token', 'tokenCredentialsUri');
+    });
+
+    it("Function singularize", function () {
+        testCompletionByEntryStart('basic/test54.raml', 'larize>>', 'singularize');
+    });
+
+    it("Function pluralize", function () {
+        testCompletionByEntryStart('basic/test54.raml', 'uralize>>', 'pluralize');
     });
 });
 
