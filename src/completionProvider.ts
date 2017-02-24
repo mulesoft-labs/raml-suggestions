@@ -1151,7 +1151,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
         }
         if (i2 > i1) {
             notAKey = true;
-            if (i2 >= i1 + 4) {
+            if (i2 >= i1 + 4 && node.property().getAdapter(parserApi.ds.RAMLPropertyService).isEmbedMap()) {
                 onlyKey = true;
                 notAKey = false;
             }
