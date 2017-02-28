@@ -1091,7 +1091,8 @@ function filterPropertyCompletion(node: parserApi.hl.IHighLevelNode, property: p
     existing:{[name:string]:boolean}) : boolean {
 
     //basic filtering
-    if (!(!property.getAdapter(parserApi.ds.RAMLPropertyService).isKey() && !property.getAdapter(parserApi.ds.RAMLPropertyService).isMerged()&&!property.getAdapter(services.RAMLPropertyService).isSystem())) {
+    const adapter = property.getAdapter(parserApi.ds.RAMLPropertyService);
+    if ( (adapter.isKey() && adapter.isEmbedMap()) || adapter.isMerged() || adapter.isSystem() ) {
         return false;
     }
 
