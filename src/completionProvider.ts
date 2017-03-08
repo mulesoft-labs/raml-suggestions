@@ -1473,7 +1473,13 @@ function enumValues(property: parserApi.ds.Property, parentNode: parserApi.hl.IH
             api &&  api.lowLevel() &&  api.lowLevel().unit() && visibleScopes.push(api.lowLevel().unit().absolutePath());
 
             api && api.wrapperNode && api.wrapperNode() && api.wrapperNode().uses && api.wrapperNode().uses().forEach((usesDeclaration: any) => {
-                usesDeclaration && usesDeclaration.value && usesDeclaration.value() && visibleScopes.push(api.lowLevel().unit().resolve(usesDeclaration.value()).absolutePath());
+                if(usesDeclaration && usesDeclaration.value && usesDeclaration.value()) {
+                    var resolvedUnit = api.lowLevel().unit().resolve(usesDeclaration.value())
+                    
+                    if(resolvedUnit) {
+                        visibleScopes.push(resolvedUnit.absolutePath());
+                    }
+                }
             })
 
             var definitionNodes = parserApi.search.globalDeclarations(parentNode).filter(node => {
