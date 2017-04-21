@@ -45,7 +45,7 @@
   },
   "yaml-ast-parser" : {
     "build" : "npm run build",
-    "gitUrl" : "https://github.com/mulesoft-labs/yaml-ast-parser.git",
+    "gitUrl" : "https://github.com/mulesoft-labs/yaml-ast-parser.git"
   },
   "ts-model" : {
     "build" : "npm run build",
