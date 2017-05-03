@@ -1,6 +1,6 @@
 {
   "name": "raml-suggestions",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc",
@@ -19,7 +19,7 @@
   "typings": "./dist/index.d.ts",
   "dependencies": {
     "underscore": "^1.8.3",
-    "raml-1-parser": "1.1.20",
+    "raml-1-parser": "1.1.21",
     "fuzzaldrin-plus": "^0.3.1"
   },
   "devDependencies": {
