@@ -1165,7 +1165,12 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     var needColon = isColonNeeded(offset, text);
     var ks = needColon ? ": " : "";
 
-    var props = hlnode.definition().allProperties();
+    var props: def.IProperty[];
+    if (hlnode.definition().isArray()) {
+        props = (<def.Array>(hlnode.definition())).component.allProperties();
+    } else {
+        props = hlnode.definition().allProperties();
+    }
 
     var existing:{[name:string]:boolean} = {};
     hlnode.attrs().forEach(x=> {
@@ -1269,6 +1274,13 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                 }
             }
         )
+    }
+    if (mv && onlyKey && rs.length === 0) { // we're probably completing an array key by now
+        const newLineIndent = (hlnode.definition().isArray()
+            && !((<def.Array>(hlnode.definition())).component.isValueType()))
+                ? ("\n" + getIndent(offset, text) + "  ")
+                : '';
+        rs.push({ text: ('-' + newLineIndent) })
     }
     return rs;
 }
