@@ -43,6 +43,18 @@ export interface IASTProvider {
      * Gets current AST node
      */
     getSelectedNode() : hl.IParseResult;
+
+    /**
+     * Gets current AST root asynchronously.
+     * Can return null.
+     */
+    getASTRootAsync() : Promise<hl.IHighLevelNode>;
+
+    /**
+     * Gets current AST node asynchronously
+     * Can return null.
+     */
+    getSelectedNodeAsync() : Promise<hl.IParseResult>;
 }
 
 /**

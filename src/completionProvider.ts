@@ -8,6 +8,7 @@ import search= parserApi.search;
 import universeModule = parserApi.universes;
 import universeHelpers = parserApi.universeHelpers;
 import services = def;
+import hl = parserApi.hl;
 
 import _ = require("underscore");
 
@@ -162,12 +163,20 @@ function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider
     request.async = true;
     request.promises = [];
 
-    var apiPromise = parserApi.parseRAML(modifiedContent(request), {
-        fsResolver: (<any>provider.contentProvider).fsResolver,
-        filePath: request.content.getPath()
-    });
+    let apiPromise : Promise<hl.IHighLevelNode> = null;
 
-    var suggestionsPromise = apiPromise.then(api => getSuggestions(request, provider, findAtOffsetInNode(request.content.getOffset(), api.highLevel())));
+    if (provider.astProvider) {
+        apiPromise = provider.astProvider.getASTRootAsync();
+    }
+
+    if (!apiPromise) {
+        apiPromise = parserApi.parseRAML(modifiedContent(request), {
+            fsResolver: (<any>provider.contentProvider).fsResolver,
+            filePath: request.content.getPath()
+        }).then(apiTopLevel=>{return apiTopLevel.highLevel()});
+    }
+
+    var suggestionsPromise = apiPromise.then(api => getSuggestions(request, provider, findAtOffsetInNode(request.content.getOffset(), api)));
 
     var requestSuggestionsPromise = suggestionsPromise.then((suggestions: Suggestion[]) => {
         return Promise.all([suggestions].concat(request.promises));

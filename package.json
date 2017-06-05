@@ -10,7 +10,8 @@
     "pullall" : "dev-env-installer pullall",
     "buildall" : "dev-env-installer buildall",
     "testall" : "dev-env-installer testall",
-    "devInstall": "dev-env-installer install"
+    "devInstall": "dev-env-installer install",
+    "test" : "npm run test-cov"
   },
   "repository": {
     "type": "git",
