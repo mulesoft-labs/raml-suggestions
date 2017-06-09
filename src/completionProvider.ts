@@ -159,6 +159,104 @@ function doSuggest(request: CompletionRequest, provider: CompletionProvider) : S
     return [];
 }
 
+class FSProviderBasedFSResolver implements FSResolverExt {
+
+    constructor(private fsProvider : IFSProvider) {
+    }
+
+    /**
+     * File contents by full path, synchronously.
+     * @param fullPath
+     */
+    content(fullPath:string): string {
+        return this.fsProvider.content(fullPath);
+    }
+
+    /**
+     * File contents by full path, asynchronously.
+     * @param fullPath
+     */
+    contentAsync(fullPath:string):Promise<string> {
+        return this.fsProvider.contentAsync(fullPath);
+    }
+
+    /**
+     * Lists directory contents.
+     * @param fullPath
+     */
+    list(fullPath: string): string[] {
+        return this.fsProvider.readDir(fullPath);
+    }
+
+    /**
+     * Checks item existance.
+     * @param fullPath
+     */
+    exists(fullPath: string): boolean {
+        return this.fsProvider.exists(fullPath);
+    }
+
+    /**
+     * Gets directory name by full path.
+     * @param fullPath
+     */
+    dirname(fullPath: string): string {
+        return this.fsProvider.dirName(fullPath);
+    }
+
+    /**
+     * Resolves one path against another.
+     * @param contextPath - path to resolve against.
+     * @param relativePath - relative path to resolve.
+     */
+    resolve(contextPath: string, relativePath: string): string {
+        return this.fsProvider.resolve(contextPath, relativePath);
+    }
+
+    /**
+     * Returns file extension name.
+     * @param fullPath
+     */
+    extname(fullPath: string): string {
+        let splitResults = fullPath.split('.');
+        if (splitResults.length < 2) return null;
+
+        return splitResults.pop();
+    }
+
+    /**
+     * Check whether the path points to a directory.
+     * @param fullPath
+     */
+    isDirectory(fullPath: string): boolean {
+        return this.fsProvider.isDirectory(fullPath);
+    }
+
+    /**
+     * Check whether the path points to a directory.
+     * @param fullPath
+     */
+    isDirectoryAsync(path: string): Promise<boolean> {
+        return this.fsProvider.isDirectoryAsync(path);
+    }
+
+    /**
+     * Checks item existance.
+     * @param fullPath
+     */
+    existsAsync(path: string): Promise<boolean> {
+        return this.fsProvider.existsAsync(path);
+    }
+
+    /**
+     * Lists directory contents.
+     * @param fullPath
+     */
+    listAsync(path: string): Promise<string[]> {
+        return this.fsProvider.readDirAsync(path);
+    }
+}
+
 function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider): Promise<Suggestion[]> {
     request.async = true;
     request.promises = [];
@@ -170,8 +268,14 @@ function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider
     }
 
     if (!apiPromise) {
+
+        let resolver = (<any>provider.contentProvider).fsResolver;
+        if (!resolver) {
+            resolver = new FSProviderBasedFSResolver(provider.contentProvider);
+        }
+
         apiPromise = parserApi.parseRAML(modifiedContent(request), {
-            fsResolver: (<any>provider.contentProvider).fsResolver,
+            fsResolver: resolver,
             filePath: request.content.getPath()
         }).then(apiTopLevel=>{return apiTopLevel.highLevel()});
     }
@@ -2115,6 +2219,22 @@ class ResolvedProvider implements IFSProvider {
     
     constructor(private resolver: FSResolverExt) {
         this.fsResolver = resolver;
+    }
+
+    /**
+     * File contents by full path, synchronously.
+     * @param fullPath
+     */
+    content(fullPath:string): string {
+        return this.fsResolver.content(fullPath);
+    }
+
+    /**
+     * File contents by full path, asynchronously.
+     * @param fullPath
+     */
+    contentAsync(fullPath:string):Promise<string> {
+        return this.fsResolver.contentAsync(fullPath);
     }
 
     contentDirName(content: IEditorStateProvider): string {
