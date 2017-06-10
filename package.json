@@ -1,6 +1,6 @@
 {
   "name": "raml-suggestions",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc",
