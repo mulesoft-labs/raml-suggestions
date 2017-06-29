@@ -159,7 +159,7 @@ describe("Async completion tests", function() {
     });
 
     it("Completion for include path", function (done) {
-        testCompletionByEntryEnd('basic/test17.raml', done, '\n  comic: !include ./XKCD/s', 'schemas');
+        testCompletionByEntryEnd('basic/test17.raml', done, '\n  comic: !include ./XKCD/s', 'schemas/');
     });
 
     it("Completion for include files", function (done) {
@@ -587,7 +587,7 @@ describe("Async completion tests", function() {
     });
 
     it("test43", function (done) {
-        testCompletionByEntryEnd('basic/test43.raml', done, 'X', 'XKCD');
+        testCompletionByEntryEnd('basic/test43.raml', done, 'X', 'XKCD/');
     });
 });
 

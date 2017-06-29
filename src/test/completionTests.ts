@@ -161,7 +161,7 @@ describe("Basic completion tests", function() {
     });
 
     it("Completion for include path", function () {
-        testCompletionByEntryEnd('basic/test17.raml', '\n  comic: !include ./XKCD/s', 'schemas');
+        testCompletionByEntryEnd('basic/test17.raml', '\n  comic: !include ./XKCD/s', 'schemas/');
     });
 
     it("Completion for include files", function () {
@@ -589,7 +589,7 @@ describe("Basic completion tests", function() {
     });
     
     it("test43", function () {
-        testCompletionByEntryEnd('basic/test43.raml', 'X', 'XKCD');
+        testCompletionByEntryEnd('basic/test43.raml', 'X', 'XKCD/');
     });
 
     it("Reference completion for a property definition", function () {
@@ -621,7 +621,7 @@ describe("Basic completion tests", function() {
     });
 
     it("Include folders names", function () {
-        testCompletionByEntryStart('basic/test44.raml', 'chemas/comic-schema.json', 'schemas');
+        testCompletionByEntryStart('basic/test44.raml', 'chemas/comic-schema.json', 'schemas/');
     });
 
     it("Include file name", function () {
