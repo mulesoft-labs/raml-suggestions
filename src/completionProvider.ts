@@ -921,7 +921,11 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
                     return false;
                 }
             }).map(x=> {
-                return {text: indexOfDot > 0 ? contentProvider.resolve(<string>dn, x).substr(indexOfDot + 1) : x}
+                var fullPath = contentProvider.resolve(<string>dn, x);
+
+                var needSlash = contentProvider.exists(fullPath) && contentProvider.isDirectory(fullPath);
+
+                return {text: indexOfDot > 0 ? fullPath.substr(indexOfDot + 1) : (x + (needSlash ? "/" : ""))}
             }));
         }
     }
@@ -950,7 +954,7 @@ function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: st
                 }
 
                 return contentProvider.readDirAsync(asString).then(dirContent => {
-                    return dirContent.filter(x => {
+                    var res = dirContent.filter(x => {
                         try {
                             var fullPath = contentProvider.resolve(asString, x);
 
@@ -960,9 +964,19 @@ function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: st
                         } catch(exception) {
                             return false;
                         }
-                    }).map(x=> {
-                        return {text: indexOfDot > 0 ? contentProvider.resolve(<string>dirName, x).substr(indexOfDot + 1) : x}
+                    }).map(x => {
+                        var fullPath = contentProvider.resolve(asString, x);
+
+                        return contentProvider.existsAsync(fullPath).then(exist => {
+                            return contentProvider.isDirectoryAsync(fullPath).then(isDir => {
+                                var needSlash = exist && isDir;
+
+                                return {text: indexOfDot > 0 ? fullPath.substr(indexOfDot + 1) : (x + (needSlash ? "/" : ""))}
+                            });
+                        })
                     });
+
+                    return Promise.all(res);
                 });
             });
         });
