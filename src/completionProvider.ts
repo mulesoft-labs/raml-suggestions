@@ -325,8 +325,22 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
         }
 
         if(kind == parserApi.search.LocationKind.VALUE_COMPLETION) {
-            var parentPropertyOfAttr = attr && (<any>attr).parent && (<any>attr).parent() && (<any>attr).parent().property && (<any>attr).parent().property();
+            var attrParent = attr && (<any>attr).parent && (<any>attr).parent();
+
+            var parentPropertyOfAttr = attrParent && attrParent.property && attrParent.property();
+
+            var attrParentType = attrParent && attrParent.definition && attrParent.definition();
+
+            var isExtendableParent = attrParentType && (universeHelpers.isExtensionType(attrParentType) || universeHelpers.isOverlayType(attrParentType));
             
+            var attrPropertyName = attr && attr.property && attr.property() && attr.property().nameId();
+            
+            var isExtendsProperty = (attrPropertyName === universeModule.Universe10.Overlay.properties.extends.name || attrPropertyName === universeModule.Universe10.Extension.properties.extends.name);
+
+            if(isExtendableParent && isExtendsProperty) {
+                return pathCompletion(request, provider.contentProvider, attr, hlnode, false);
+            }
+
             if(parentPropertyOfAttr && (<any>universeHelpers).isUsesProperty(parentPropertyOfAttr)) {
                 return pathCompletion(request, provider.contentProvider, attr, hlnode, false);
             }
