@@ -879,6 +879,14 @@ describe("Basic completion tests", function() {
     it("Function pluralize", function () {
         testCompletionByEntryStart('basic/test54.raml', 'uralize>>', 'pluralize');
     });
+
+    it("Overlay extends property", function () {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/overlay.raml', 'extends: a', 'api.raml');
+    });
+
+    it("Extension extends property", function () {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/extension.raml', 'extends: a', 'api.raml');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {

@@ -589,6 +589,14 @@ describe("Async completion tests", function() {
     it("test43", function (done) {
         testCompletionByEntryEnd('basic/test43.raml', done, 'X', 'XKCD/');
     });
+
+    it("Overlay extends property", function (done) {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/overlay.raml', done, 'extends: a', 'api.raml');
+    });
+
+    it("Extension extends property", function (done) {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/extension.raml', done, 'extends: a', 'api.raml');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {
