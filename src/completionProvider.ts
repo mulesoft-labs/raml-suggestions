@@ -1291,33 +1291,39 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                         }
                     }
                 }
-                if (oftenKeys) {
-                    oftenKeys.forEach(y=> {
-                        var original = y;
-                        
+                
+                if(oftenKeys) {
+                    oftenKeys.forEach(oftenKey => {
+                        var original = oftenKey;
+                
                         var cs=prop.valueDocProvider();
-                        var description=""
-                        if (cs){
-                            description=cs(y);
+                        var description="";
+                       
+                        if(cs) {
+                            description=cs(oftenKey);
                         }
-                        if (needColon) {
-                            rs.push({
-                                text: y + ":" + "\n" + getIndent(offset, text) + "  ",
-                                description: description,
-                                displayText: y,
-                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null,
-                                category: categoryByRanges(original, hlnode.definition(), prop.range())
-                            })
-                        }
-                        else{
-                            rs.push({
-                                text: y ,
-                                description: description,
-                                displayText: y,
-                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null,
-                                category: categoryByRanges(original, hlnode.definition(), prop.range())
-                            })
-                        }
+                       
+                        var proposedContainsSlash = (oftenKey.indexOf("/") >= 0);
+                       
+                        var requestContainsSlash = (request.valuePrefix() && request.valuePrefix().indexOf("/") >= 0);
+                
+                        var actualValue = requestContainsSlash ? oftenKey.replace(request.valuePrefix(), '') : oftenKey;
+                       
+                        var textValue = actualValue + (needColon ? (':' + '\n' + getIndent(offset, text) + '  ') : '');
+                       
+                        var prefixValue = proposedContainsSlash  ? request.valuePrefix() : null;
+                       
+                        rs.push({
+                            text: textValue,
+                       
+                            description: description,
+                       
+                            displayText: oftenKey,
+                       
+                            prefix: requestContainsSlash ? prefixValue : null,
+                       
+                            category: categoryByRanges(original, hlnode.definition(), prop.range())
+                        });
                     });
                 }
             }
