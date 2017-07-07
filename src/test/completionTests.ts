@@ -887,6 +887,10 @@ describe("Basic completion tests", function() {
     it("Extension extends property", function () {
         testCompletionByEntryEnd('basic/OverlaysAndExtension/extension.raml', 'extends: a', 'api.raml');
     });
+
+    it("test55", function () {
+        testCompletionByEntryEnd('basic/test55.raml', 'discriminator: l', 'level');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
