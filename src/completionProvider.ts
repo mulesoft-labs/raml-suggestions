@@ -337,6 +337,32 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
             
             var isExtendsProperty = (attrPropertyName === universeModule.Universe10.Overlay.properties.extends.name || attrPropertyName === universeModule.Universe10.Extension.properties.extends.name);
 
+            if(attrParentType && attrParentType.isAssignableFrom(parserApi.universes.Universe10.TypeDeclaration.name)) {
+                if(attrPropertyName === universeModule.Universe10.ObjectTypeDeclaration.properties.discriminator.name) {
+                    var actualType = attrParent.localType && attrParent.localType()
+
+                    var typeProps = (actualType && actualType.allProperties()) || [];
+
+                    typeProps = typeProps.filter((typeProp: any) => {
+                        return typeProp.isPrimitive && typeProp.isPrimitive();
+                    });
+                    
+                    return typeProps.map((typeProp: any) => {
+                        var propertyName = typeProp.nameId();
+                        
+                        return {
+                            text: propertyName,
+                            
+                            displayText: propertyName,
+                            
+                            description: typeProp.description(),
+                            
+                            category: categoryByRanges(propertyName, attrParentType, typeProp.range())
+                        }
+                    });
+                }
+            }
+            
             if(isExtendableParent && isExtendsProperty) {
                 return pathCompletion(request, provider.contentProvider, attr, hlnode, false);
             }
