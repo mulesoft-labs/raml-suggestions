@@ -895,6 +895,10 @@ describe("Basic completion tests", function() {
     it("test56", function () {
         testCompletionByEntryEnd('basic/test56.raml', 'application/', 'application/json, application/xml');
     });
+
+    it("test57", function () {
+        testCompletionByEntryEnd('basic/test57.raml', 'ty', 'type');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {

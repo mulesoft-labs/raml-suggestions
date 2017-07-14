@@ -605,6 +605,10 @@ describe("Async completion tests", function() {
     it("test56", function (done) {
         testCompletionByEntryEnd('basic/test56.raml', done, 'application/', 'application/json, application/xml');
     });
+
+    it("test57", function (done) {
+        testCompletionByEntryEnd('basic/test57.raml', done, 'ty', 'type');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {
