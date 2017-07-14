@@ -1185,8 +1185,14 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
 
     var text = request.content.getText();
     var offset = request.content.getOffset();
+    
+    var rootWrapper: any = hlnode.root() && hlnode.root().wrapperNode();
 
-    if (hasNewLine) {
+    var isDefaultMedia = rootWrapper && rootWrapper.mediaType && rootWrapper.mediaType() && (rootWrapper.mediaType().length > 0);
+    
+    var isDefaultBodyProperty = isDefaultMedia && hlnode.property && hlnode.property() && parserApi.universeHelpers.isBodyProperty(hlnode.property());
+    
+    if(hasNewLine) {
         var is = getIndentWithSequenc(node.lowLevel().keyStart(), text);
         if (is == undefined) {
             is = "";
@@ -1194,11 +1200,10 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
         var i2s = getIndentWithSequenc(offset, text);
         var i1 = is.length;
         var i2 = i2s.length
-        if (i1 == i2 && node.parent()) {
-            if (node.property().getAdapter(parserApi.ds.RAMLPropertyService).isMerged()) {
+        if (i1 == i2 && node.parent() && !isDefaultBodyProperty) {
+            if(node.property().getAdapter(parserApi.ds.RAMLPropertyService).isMerged()) {
                 hlnode = hlnode.parent();
-            }
-            else {
+            } else {
                 notAKey = false;
                 onlyKey = true;
             }
@@ -1241,7 +1246,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
 
     //TODO MAKE IT BETTER (actually we need to filter out and guess availabe keys)
     var rs : Suggestion[]=[];
-    if (!mv&&!onlyKey) {
+    if ((!mv || isDefaultBodyProperty) && !onlyKey) {
         rs=props.map(x=> {
             var complextionText = x.nameId() + ks;
             if(x.range().isAssignableFrom(universeModule.Universe10.ExampleSpec.name)) {
