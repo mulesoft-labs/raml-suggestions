@@ -84,9 +84,10 @@ describe("Async completion tests", function() {
     });
 
     //this test contains impossible suggestions
-    it("User-defined types reference completion for a property shortcut inheritance definition. BUG#2611. FIXME", function (done) {
-        testCompletionByEntryEnd('basic/test10.raml', done, '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
-    });
+    //Commented out invalid test
+    // it("User-defined types reference completion for a property shortcut inheritance definition. BUG#2611. FIXME", function (done) {
+    //     testCompletionByEntryEnd('basic/test10.raml', done, '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
+    // });
 
     //this test contains impossible suggestions
     it("User-defined types reference completion for a property inheritance definition. BUG#2612 #2611. FIXME", function (done) {
