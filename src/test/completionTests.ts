@@ -87,9 +87,10 @@ describe("Basic completion tests", function() {
     });
 
     //this test contains impossible suggestions
-    it("User-defined types reference completion for a property shortcut inheritance definition. BUG#2611. FIXME", function () {
-        testCompletionByEntryEnd('basic/test10.raml', '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
-    });
+    //Commented out invalid test
+    // it("User-defined types reference completion for a property shortcut inheritance definition. BUG#2611. FIXME", function () {
+    //     testCompletionByEntryEnd('basic/test10.raml', '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
+    // });
 
     //this test contains impossible suggestions
     it("User-defined types reference completion for a property inheritance definition. BUG#2612 #2611. FIXME", function () {
@@ -161,7 +162,7 @@ describe("Basic completion tests", function() {
     });
 
     it("Completion for include path", function () {
-        testCompletionByEntryEnd('basic/test17.raml', '\n  comic: !include ./XKCD/s', 'schemas');
+        testCompletionByEntryEnd('basic/test17.raml', '\n  comic: !include ./XKCD/s', 'schemas/');
     });
 
     it("Completion for include files", function () {
@@ -589,7 +590,7 @@ describe("Basic completion tests", function() {
     });
     
     it("test43", function () {
-        testCompletionByEntryEnd('basic/test43.raml', 'X', 'XKCD');
+        testCompletionByEntryEnd('basic/test43.raml', 'X', 'XKCD/');
     });
 
     it("Reference completion for a property definition", function () {
@@ -621,7 +622,7 @@ describe("Basic completion tests", function() {
     });
 
     it("Include folders names", function () {
-        testCompletionByEntryStart('basic/test44.raml', 'chemas/comic-schema.json', 'schemas');
+        testCompletionByEntryStart('basic/test44.raml', 'chemas/comic-schema.json', 'schemas/');
     });
 
     it("Include file name", function () {
@@ -878,6 +879,26 @@ describe("Basic completion tests", function() {
 
     it("Function pluralize", function () {
         testCompletionByEntryStart('basic/test54.raml', 'uralize>>', 'pluralize');
+    });
+
+    it("Overlay extends property", function () {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/overlay.raml', 'extends: a', 'api.raml');
+    });
+
+    it("Extension extends property", function () {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/extension.raml', 'extends: a', 'api.raml');
+    });
+
+    it("test55", function () {
+        testCompletionByEntryEnd('basic/test55.raml', 'discriminator: l', 'level');
+    });
+
+    it("test56", function () {
+        testCompletionByEntryEnd('basic/test56.raml', 'application/', 'application/json, application/xml');
+    });
+
+    it("test57", function () {
+        testCompletionByEntryEnd('basic/test57.raml', 'ty', 'type');
     });
 });
 

@@ -1,0 +1,13 @@
+#%RAML 1.0
+title: test
+
+types:
+  blah:
+    discriminator: l
+    properties:
+      level:
+        type: string
+        enum: [aaa, asd]
+      name: string
+      level2:
+        properties:

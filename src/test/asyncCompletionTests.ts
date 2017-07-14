@@ -84,9 +84,10 @@ describe("Async completion tests", function() {
     });
 
     //this test contains impossible suggestions
-    it("User-defined types reference completion for a property shortcut inheritance definition. BUG#2611. FIXME", function (done) {
-        testCompletionByEntryEnd('basic/test10.raml', done, '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
-    });
+    //Commented out invalid test
+    // it("User-defined types reference completion for a property shortcut inheritance definition. BUG#2611. FIXME", function (done) {
+    //     testCompletionByEntryEnd('basic/test10.raml', done, '\n      property: [PartOne, Tes', 'TestTypeObject, TestType, TestTypeUnion, TestTypePrimitive, TestType1, TestTypeWithInheritance, TestType2, TestType3');
+    // });
 
     //this test contains impossible suggestions
     it("User-defined types reference completion for a property inheritance definition. BUG#2612 #2611. FIXME", function (done) {
@@ -159,7 +160,7 @@ describe("Async completion tests", function() {
     });
 
     it("Completion for include path", function (done) {
-        testCompletionByEntryEnd('basic/test17.raml', done, '\n  comic: !include ./XKCD/s', 'schemas');
+        testCompletionByEntryEnd('basic/test17.raml', done, '\n  comic: !include ./XKCD/s', 'schemas/');
     });
 
     it("Completion for include files", function (done) {
@@ -587,7 +588,27 @@ describe("Async completion tests", function() {
     });
 
     it("test43", function (done) {
-        testCompletionByEntryEnd('basic/test43.raml', done, 'X', 'XKCD');
+        testCompletionByEntryEnd('basic/test43.raml', done, 'X', 'XKCD/');
+    });
+
+    it("Overlay extends property", function (done) {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/overlay.raml', done, 'extends: a', 'api.raml');
+    });
+
+    it("Extension extends property", function (done) {
+        testCompletionByEntryEnd('basic/OverlaysAndExtension/extension.raml', done, 'extends: a', 'api.raml');
+    });
+
+    it("test55", function (done) {
+        testCompletionByEntryEnd('basic/test55.raml', done, 'discriminator: l', 'level');
+    });
+
+    it("test56", function (done) {
+        testCompletionByEntryEnd('basic/test56.raml', done, 'application/', 'application/json, application/xml');
+    });
+
+    it("test57", function (done) {
+        testCompletionByEntryEnd('basic/test57.raml', done, 'ty', 'type');
     });
 });
 
