@@ -325,8 +325,48 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
         }
 
         if(kind == parserApi.search.LocationKind.VALUE_COMPLETION) {
-            var parentPropertyOfAttr = attr && (<any>attr).parent && (<any>attr).parent() && (<any>attr).parent().property && (<any>attr).parent().property();
+            var attrParent = attr && (<any>attr).parent && (<any>attr).parent();
+
+            var parentPropertyOfAttr = attrParent && attrParent.property && attrParent.property();
+
+            var attrParentType = attrParent && attrParent.definition && attrParent.definition();
+
+            var isExtendableParent = attrParentType && (universeHelpers.isExtensionType(attrParentType) || universeHelpers.isOverlayType(attrParentType));
             
+            var attrPropertyName = attr && attr.property && attr.property() && attr.property().nameId();
+            
+            var isExtendsProperty = (attrPropertyName === universeModule.Universe10.Overlay.properties.extends.name || attrPropertyName === universeModule.Universe10.Extension.properties.extends.name);
+
+            if(attrParentType && attrParentType.isAssignableFrom(parserApi.universes.Universe10.TypeDeclaration.name)) {
+                if(attrPropertyName === universeModule.Universe10.ObjectTypeDeclaration.properties.discriminator.name) {
+                    var actualType = attrParent.localType && attrParent.localType()
+
+                    var typeProps = (actualType && actualType.allProperties()) || [];
+
+                    typeProps = typeProps.filter((typeProp: any) => {
+                        return typeProp.isPrimitive && typeProp.isPrimitive();
+                    });
+                    
+                    return typeProps.map((typeProp: any) => {
+                        var propertyName = typeProp.nameId();
+                        
+                        return {
+                            text: propertyName,
+                            
+                            displayText: propertyName,
+                            
+                            description: typeProp.description(),
+                            
+                            category: categoryByRanges(propertyName, attrParentType, typeProp.range())
+                        }
+                    });
+                }
+            }
+            
+            if(isExtendableParent && isExtendsProperty) {
+                return pathCompletion(request, provider.contentProvider, attr, hlnode, false);
+            }
+
             if(parentPropertyOfAttr && (<any>universeHelpers).isUsesProperty(parentPropertyOfAttr)) {
                 return pathCompletion(request, provider.contentProvider, attr, hlnode, false);
             }
@@ -921,7 +961,11 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
                     return false;
                 }
             }).map(x=> {
-                return {text: indexOfDot > 0 ? contentProvider.resolve(<string>dn, x).substr(indexOfDot + 1) : x}
+                var fullPath = contentProvider.resolve(<string>dn, x);
+
+                var needSlash = contentProvider.exists(fullPath) && contentProvider.isDirectory(fullPath);
+
+                return {text: indexOfDot > 0 ? fullPath.substr(indexOfDot + 1) : (x + (needSlash ? "/" : ""))}
             }));
         }
     }
@@ -950,7 +994,7 @@ function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: st
                 }
 
                 return contentProvider.readDirAsync(asString).then(dirContent => {
-                    return dirContent.filter(x => {
+                    var res = dirContent.filter(x => {
                         try {
                             var fullPath = contentProvider.resolve(asString, x);
 
@@ -960,9 +1004,19 @@ function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: st
                         } catch(exception) {
                             return false;
                         }
-                    }).map(x=> {
-                        return {text: indexOfDot > 0 ? contentProvider.resolve(<string>dirName, x).substr(indexOfDot + 1) : x}
+                    }).map(x => {
+                        var fullPath = contentProvider.resolve(asString, x);
+
+                        return contentProvider.existsAsync(fullPath).then(exist => {
+                            return contentProvider.isDirectoryAsync(fullPath).then(isDir => {
+                                var needSlash = exist && isDir;
+
+                                return {text: indexOfDot > 0 ? fullPath.substr(indexOfDot + 1) : (x + (needSlash ? "/" : ""))}
+                            });
+                        })
                     });
+
+                    return Promise.all(res);
                 });
             });
         });
@@ -1131,8 +1185,14 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
 
     var text = request.content.getText();
     var offset = request.content.getOffset();
+    
+    var rootWrapper: any = hlnode.root() && hlnode.root().wrapperNode();
 
-    if (hasNewLine) {
+    var isDefaultMedia = rootWrapper && rootWrapper.mediaType && rootWrapper.mediaType() && (rootWrapper.mediaType().length > 0);
+    
+    var isDefaultBodyProperty = isDefaultMedia && hlnode.property && hlnode.property() && parserApi.universeHelpers.isBodyProperty(hlnode.property());
+    
+    if(hasNewLine) {
         var is = getIndentWithSequenc(node.lowLevel().keyStart(), text);
         if (is == undefined) {
             is = "";
@@ -1140,11 +1200,10 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
         var i2s = getIndentWithSequenc(offset, text);
         var i1 = is.length;
         var i2 = i2s.length
-        if (i1 == i2 && node.parent()) {
-            if (node.property().getAdapter(parserApi.ds.RAMLPropertyService).isMerged()) {
+        if (i1 == i2 && node.parent() && !isDefaultBodyProperty) {
+            if(node.property().getAdapter(parserApi.ds.RAMLPropertyService).isMerged()) {
                 hlnode = hlnode.parent();
-            }
-            else {
+            } else {
                 notAKey = false;
                 onlyKey = true;
             }
@@ -1187,7 +1246,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
 
     //TODO MAKE IT BETTER (actually we need to filter out and guess availabe keys)
     var rs : Suggestion[]=[];
-    if (!mv&&!onlyKey) {
+    if ((!mv || isDefaultBodyProperty) && !onlyKey) {
         rs=props.map(x=> {
             var complextionText = x.nameId() + ks;
             if(x.range().isAssignableFrom(universeModule.Universe10.ExampleSpec.name)) {
@@ -1237,33 +1296,39 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                         }
                     }
                 }
-                if (oftenKeys) {
-                    oftenKeys.forEach(y=> {
-                        var original = y;
-                        
+                
+                if(oftenKeys) {
+                    oftenKeys.forEach(oftenKey => {
+                        var original = oftenKey;
+                
                         var cs=prop.valueDocProvider();
-                        var description=""
-                        if (cs){
-                            description=cs(y);
+                        var description="";
+                       
+                        if(cs) {
+                            description=cs(oftenKey);
                         }
-                        if (needColon) {
-                            rs.push({
-                                text: y + ":" + "\n" + getIndent(offset, text) + "  ",
-                                description: description,
-                                displayText: y,
-                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null,
-                                category: categoryByRanges(original, hlnode.definition(), prop.range())
-                            })
-                        }
-                        else{
-                            rs.push({
-                                text: y ,
-                                description: description,
-                                displayText: y,
-                                prefix: y.indexOf("/") >= 0  ? request.valuePrefix() : null,
-                                category: categoryByRanges(original, hlnode.definition(), prop.range())
-                            })
-                        }
+                       
+                        var proposedContainsSlash = (oftenKey.indexOf("/") >= 0);
+                       
+                        var requestContainsSlash = (request.valuePrefix() && request.valuePrefix().indexOf("/") >= 0);
+                
+                        var actualValue = requestContainsSlash ? oftenKey.replace(request.valuePrefix(), '') : oftenKey;
+                       
+                        var textValue = actualValue + (needColon ? (':' + '\n' + getIndent(offset, text) + '  ') : '');
+                       
+                        var prefixValue = proposedContainsSlash  ? request.valuePrefix() : null;
+                       
+                        rs.push({
+                            text: textValue,
+                       
+                            description: description,
+                       
+                            displayText: oftenKey,
+                       
+                            prefix: requestContainsSlash ? prefixValue : null,
+                       
+                            category: categoryByRanges(original, hlnode.definition(), prop.range())
+                        });
                     });
                 }
             }
