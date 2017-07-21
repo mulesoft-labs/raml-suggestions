@@ -737,7 +737,15 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
         break;
     }
 
-    var astNode=ast.findElementAtOffset(actualOffset);
+    var astNode = ast.findElementAtOffset(actualOffset);
+
+    if(astNode && astNode.root() && astNode.root() === astNode) {
+        var lastChild = findLastChild(astNode);
+        
+        if(lastChild && lastChild.lowLevel() && (lastChild.lowLevel().end() <= offset)) {
+            astNode = lastChild;
+        }
+    }
 
     if(!allowNull && !astNode){
         return ast;
@@ -752,6 +760,32 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
     }
 
     return astNode;
+}
+
+function findLastChild(node: parserApi.hl.IHighLevelNode): parserApi.hl.IHighLevelNode {
+    if(!node) {
+        return null;
+    }
+
+    if(node.lowLevel()) {
+        var result = node;
+
+        node.elements().forEach(child => {
+            if(child.lowLevel().unit() != node.lowLevel().unit()) {
+                return;
+            }
+
+            var lastChild = findLastChild(child);
+
+            if(lastChild) {
+                result = lastChild;
+            }
+        });
+
+        return result;
+    }
+    
+    return null;
 }
 
 function modifiedContent(request: CompletionRequest): string {
@@ -784,8 +818,18 @@ function findAtOffsetInNode(offset: number, node: parserApi.hl.IHighLevelNode): 
 
         break;
     }
+    
+    var astNode = node.findElementAtOffset(actualOffset);
 
-    return node.findElementAtOffset(actualOffset);
+    if(astNode && astNode.root() && astNode.root() === astNode) {
+        var lastChild = findLastChild(astNode);
+
+        if(lastChild && lastChild.lowLevel() && (lastChild.lowLevel().end() <= offset)) {
+            astNode = lastChild;
+        }
+    }
+    
+    return astNode;
 }
 
 function getIndent(offset:number,text:string): string {
@@ -1199,7 +1243,8 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
         }
         var i2s = getIndentWithSequenc(offset, text);
         var i1 = is.length;
-        var i2 = i2s.length
+        var i2 = i2s.length;
+        
         if (i1 == i2 && node.parent() && !isDefaultBodyProperty) {
             if(node.property().getAdapter(parserApi.ds.RAMLPropertyService).isMerged()) {
                 hlnode = hlnode.parent();
@@ -1207,17 +1252,23 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                 notAKey = false;
                 onlyKey = true;
             }
-        }
-        if (i2 > i1) {
+        } else if(i2 > i1) {
             notAKey = true;
-            if (i2 >= i1 + 4) {
+            
+            if(i2 >= i1 + 4) {
                 onlyKey = true;
                 notAKey = false;
             }
-        }
-        while (i2 < i1 && hlnode.parent()) {
-            hlnode = hlnode.parent();
-            i1 = i1 - 2;
+        } else if(i1 !== i2) {
+            while (i2 <= i1 && hlnode.parent()) {
+                hlnode = hlnode.parent();
+
+                var indent = getIndentWithSequenc(hlnode.lowLevel().keyStart(), text);
+
+                i1 = (indent && indent.length) || 0;
+            }
+
+            notAKey = true;
         }
     }
     var needColon = isColonNeeded(offset, text);
@@ -1232,10 +1283,10 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
 
     props = props.filter(x=>filterPropertyCompletion(hlnode,x, existing))
 
-    if (node.definition().isAssignableFrom(parserApi.universes.Universe10.TypeDeclaration.name)){
-        if (!node.definition().isAssignableFrom("ObjectTypeDeclaration")){
-            if (!node.attr("type")){
-                var q=node.definition().universe().type("ObjectTypeDeclaration")
+    if (hlnode.definition().isAssignableFrom(parserApi.universes.Universe10.TypeDeclaration.name)){
+        if (!hlnode.definition().isAssignableFrom("ObjectTypeDeclaration")){
+            if (!hlnode.attr("type")){
+                var q=hlnode.definition().universe().type("ObjectTypeDeclaration")
                 if (q) {
                     props.push((<def.NodeClass>q).property("properties"))
                 }
