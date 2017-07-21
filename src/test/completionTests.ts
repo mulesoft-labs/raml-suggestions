@@ -7,7 +7,7 @@ import testApi = require('./completionTestApi');
 
 describe("Basic completion tests", function() {
     it("test0", function () {
-        testCompletionByEntryEnd('basic/LibraryExample/slack.raml', 'CH11\n    ', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, displayName, properties, get, put, post, delete, options, head, patch');
+        testCompletionByEntryEnd('basic/LibraryExample/slack.raml', 'CH11\n    ', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, displayName');
     });
     
     it("test1", function () {
@@ -899,6 +899,26 @@ describe("Basic completion tests", function() {
 
     it("test57", function () {
         testCompletionByEntryEnd('basic/test57.raml', 'ty', 'type');
+    });
+
+    it("test58_1", function () {
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 1', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, description, displayName');
+    });
+
+    it("test58_2", function () {
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 2', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, description, displayName');
+    });
+
+    it("test58_3", function () {
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 3', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, description, displayName');
+    });
+
+    it("test58_4", function () {
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 4', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+    });
+
+    it("test58_5", function () {
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
     });
 });
 

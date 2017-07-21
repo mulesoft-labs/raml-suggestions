@@ -7,9 +7,9 @@ import testApi = require('./completionTestApi');
 
 describe("Async completion tests", function() {
     it("test0", function (done) {
-        testCompletionByEntryEnd('basic/LibraryExample/slack.raml', done, 'CH11\n    ', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, displayName, properties, get, put, post, delete, options, head, patch');
+        testCompletionByEntryEnd('basic/LibraryExample/slack.raml', done, 'CH11\n    ', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, displayName');
     });
-    
+
     it("test1", function (done) {
         testCompletionByEntryEnd('basic/test1.raml', done, 'juan: s', 'string, SimpleType1, SimpleType2, SimpleType');
     });
@@ -609,6 +609,26 @@ describe("Async completion tests", function() {
 
     it("test57", function (done) {
         testCompletionByEntryEnd('basic/test57.raml', done, 'ty', 'type');
+    });
+
+    it("test58_1", function (done) {
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 1', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, description, displayName');
+    });
+
+    it("test58_2", function (done) {
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 2', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, description, displayName');
+    });
+
+    it("test58_3", function (done) {
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 3', 'queryParameters, headers, queryString, responses, body, protocols, is, securedBy, description, displayName');
+    });
+
+    it("test58_4", function (done) {
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 4', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+    });
+
+    it("test58_5", function (done) {
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
     });
 });
 
