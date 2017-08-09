@@ -100,6 +100,56 @@ export function suggestAsync(editorState: IEditorStateProvider, fsProvider: IFSP
     return completionProvider.suggestAsync(completionRequest, true);
 }
 
+function getAllUnionOptions(c: parserApi.hl.IUnionType, depth: number = 0): parserApi.hl.ITypeDefinition[] {
+    if (depth>20) {
+        return [];
+    }
+    try {
+        let result: parserApi.hl.ITypeDefinition[] = [];
+        const tp = c.leftType();
+        if (tp) {
+            result.push(tp);
+        }
+        const r = c.rightType();
+        if (r) {
+            if (r.hasUnionInHierarchy()) {
+                const options = getAllUnionOptions(r.unionInHierarchy(), depth + 1);
+                result = result.concat(options);
+            }
+            else {
+                result.push(r);
+            }
+        }
+        return result;
+    } finally {
+    }
+}
+
+
+function findGlobalNames(node: parserApi.hl.IParseResult, request: CompletionRequest): any[] {
+    const root = node.root()
+    const rt: string[] = []
+    findGlobalNamesInChildren(rt, root, request.prefix());
+    return rt.map(word => { return {
+        text: word,
+        description: ""
+    }})
+}
+
+function findGlobalNamesInChildren(rt: string[], node: parserApi.hl.IParseResult, prefix: string) {
+    node.children().forEach(child => {
+        if (child.isAttr() && child.name().lastIndexOf("name") == child.name().length - 4) {
+            const name = child.asAttr().value()
+            if (typeof name === 'string' && name.indexOf(prefix) === 0) {
+                rt.push(name)
+            }
+        }
+        if (child.children() && child.children().length > 0) {
+            findGlobalNamesInChildren(rt, child, prefix)
+        }
+    })
+}
+
 function categoryByRanges(suggestion: string, parentRange: services.ITypeDefinition, propertyRange: services.ITypeDefinition): string {
     var categoryNames:string[] = Object.keys(categories);
 
@@ -1145,7 +1195,8 @@ function filterPropertyCompletion(node: parserApi.hl.IHighLevelNode, property: p
     existing:{[name:string]:boolean}) : boolean {
 
     //basic filtering
-    if (!(!property.getAdapter(parserApi.ds.RAMLPropertyService).isKey() && !property.getAdapter(parserApi.ds.RAMLPropertyService).isMerged()&&!property.getAdapter(services.RAMLPropertyService).isSystem())) {
+    const adapter = property.getAdapter(parserApi.ds.RAMLPropertyService);
+    if ( (adapter.isKey() && adapter.isEmbedMap()) || adapter.isMerged() || adapter.isSystem() ) {
         return false;
     }
 
@@ -1210,7 +1261,7 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
         }
         if (i2 > i1) {
             notAKey = true;
-            if (i2 >= i1 + 4) {
+            if (i2 >= i1 + 4 && node.property().getAdapter(parserApi.ds.RAMLPropertyService).isEmbedMap()) {
                 onlyKey = true;
                 notAKey = false;
             }
@@ -1223,12 +1274,41 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
     var needColon = isColonNeeded(offset, text);
     var ks = needColon ? ": " : "";
 
-    var props = hlnode.definition().allProperties();
+    const hlType = hlnode.definition().isArray()
+        ? (<def.Array>(hlnode.definition())).component
+        : hlnode.definition();
+
+    let props: def.IProperty[] = hlType.allProperties();
 
     var existing:{[name:string]:boolean} = {};
     hlnode.attrs().forEach(x=> {
         existing[x.name()] = true;
     });
+
+    if (hlType.hasUnionInHierarchy()) {
+        const options = getAllUnionOptions(hlType.unionInHierarchy());
+        let bestPropsMatch = 0;
+        let propsForCompletion: parserApi.hl.IProperty[] = [];
+        options.forEach(option => {
+            if (!option.hasUnionInHierarchy()) {
+                const optionProps = option.allProperties()
+                    .filter( prop => filterPropertyCompletion(hlnode, prop, existing));
+                const matched = option.allProperties().length - optionProps.length;
+
+                if (matched > bestPropsMatch) { // when there's a better match, forget previous results
+                    propsForCompletion = [];
+                    bestPropsMatch = matched;
+                }
+                // show completion for all missing props of all unions that have the same number of matched properties
+                if (matched === bestPropsMatch) {
+                    propsForCompletion = propsForCompletion.concat(optionProps);
+                }
+            }
+        });
+        if (propsForCompletion.length > 0) { // if there's a full match, there's nothing to complete for unions anymore
+            props = props.concat(propsForCompletion);
+        }
+    }
 
     props = props.filter(x=>filterPropertyCompletion(hlnode,x, existing))
 
@@ -1333,6 +1413,13 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
                 }
             }
         )
+    }
+    if (mv && onlyKey && rs.length === 0) { // we're probably completing an array key by now
+        const newLineIndent = (hlnode.definition().isArray()
+            && !((<def.Array>(hlnode.definition())).component.isValueType()))
+                ? ("\n" + getIndent(offset, text) + "  ")
+                : '';
+        rs.push({ text: ('-' + newLineIndent) })
     }
     return rs;
 }
