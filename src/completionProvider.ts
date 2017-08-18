@@ -1116,6 +1116,10 @@ function pathReferencePartCompletion(request:CompletionRequest, contentProvider:
     if (!includePath || !includeReference) {
         return [];
     }
+    
+    if(!attr) {
+        return [];
+    }
 
     var includeUnit = attr.lowLevel().unit().resolve(includePath);
     if (!includeUnit) {
