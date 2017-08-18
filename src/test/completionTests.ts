@@ -920,6 +920,10 @@ describe("Basic completion tests", function() {
     it("test58_5", function () {
         testCompletionByEntryStart('basic/test58.raml', '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
     });
+
+    it("test59", function () {
+        testCompletionByEntryEnd('basic/test59.raml', '!include#', '');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {

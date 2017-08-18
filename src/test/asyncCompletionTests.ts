@@ -630,6 +630,10 @@ describe("Async completion tests", function() {
     it("test58_5", function (done) {
         testCompletionByEntryStart('basic/test58.raml', done, '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
     });
+
+    it("test59", function (done) {
+        testCompletionByEntryEnd('basic/test59.raml', done, '!include#', '');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {
