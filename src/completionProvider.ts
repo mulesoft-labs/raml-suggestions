@@ -17,7 +17,25 @@ import {IASTProvider} from "./completionProviderInterfaces";
 import {FSResolverExt} from "./completionProviderInterfaces";
 import {Suggestion} from "./completionProviderInterfaces";
 
+import loggerModule = require("./logger")
+
 var categories = require("../resources/categories.json");
+
+let _logger : loggerModule.ILogger = null;
+
+export function setLogger(logger: loggerModule.ILogger) {
+    _logger = logger;
+}
+
+/**
+ * Returns logger set for the module, or empty logger if nothing is set.
+ * @return {any}
+ */
+function getLogger() : loggerModule.ILogger {
+    if (_logger) return _logger;
+
+    return new loggerModule.EmptyLogger();
+}
 
 export class CompletionRequest {
     content: IEditorStateProvider;
@@ -159,11 +177,21 @@ function doSuggest(request: CompletionRequest, provider: CompletionProvider) : S
 }
 
 function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider): Promise<Suggestion[]> {
+
+    getLogger().debug("Suggestions request for prefix: " + request.prefix()
+        + " and value prefix: "+ request.valuePrefix(),
+        "completionProvider", "doSuggestAsync");
+
     request.async = true;
     request.promises = [];
 
+    let fsResolver = (<any>provider.contentProvider).fsResolver;
+    if (!fsResolver) {
+        fsResolver = new ProviderBasedResolver(provider.contentProvider);
+    }
+
     var apiPromise = parserApi.parseRAML(modifiedContent(request), {
-        fsResolver: (<any>provider.contentProvider).fsResolver,
+        fsResolver: fsResolver,
         filePath: request.content.getPath()
     });
 
@@ -188,6 +216,11 @@ function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider
 
 function getSuggestions(request: CompletionRequest, provider: CompletionProvider,
                         preParsedAst: parserApi.hl.IParseResult = undefined, project?: parserApi.ll.IProject): Suggestion[] {
+
+    getLogger().debugDetail("Suggestions request for prefix: " + request.prefix()
+        + " and value prefix: "+ request.valuePrefix(),
+        "completionProvider", "getSuggestions");
+
     provider.currentRequest = request;
 
     try {
@@ -202,6 +235,9 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
         var text = request.content.getText();
 
         var kind = completionKind(request);
+
+        getLogger().debugDetail("Determined completion kind: " + kind,
+            "completionProvider", "getSuggestions");
 
         var node: parserApi.hl.IHighLevelNode =
             <parserApi.hl.IHighLevelNode>(preParsedAst ? preParsedAst : getAstNode(request, provider.contentProvider, true, true, project));
@@ -707,7 +743,12 @@ function completionKind(request: CompletionRequest) {
 function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, clearLastChar: boolean = true, allowNull: boolean = true, oldProject?: parserApi.ll.IProject): parserApi.hl.IParseResult {
     var newProjectId: string = contentProvider.contentDirName(request.content);
 
-    var project: any = oldProject || parserApi.project.createProject(newProjectId, <FSResolverExt>(<any>contentProvider).fsResolver);
+    let fsResolver = <FSResolverExt>(<any>contentProvider).fsResolver;
+    if (!fsResolver) {
+        fsResolver = new ProviderBasedResolver(contentProvider);
+    }
+
+    var project: any = oldProject || parserApi.project.createProject(newProjectId, fsResolver);
 
     var offset = request.content.getOffset();
 
@@ -906,9 +947,16 @@ function pathCompletion(request:CompletionRequest, contentProvider: IFSProvider,
 }
 
 function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvider, attr: parserApi.hl.IAttribute, hlNode: parserApi.hl.IHighLevelNode, custom:boolean) {
+
+    getLogger().debug("Path part completion for prefix: " + request.valuePrefix(),
+                      "completionProvider", "pathPartCompletion");
+
     var prefix = request.valuePrefix();
 
     var dn: string | Promise<string> = contentProvider.contentDirName(request.content);
+
+    getLogger().debugDetail("Directory name is: " + dn,
+        "completionProvider", "pathPartCompletion");
 
     var ll = contentProvider.resolve(<string>dn, prefix.indexOf('/') === 0 ? ('.' + prefix) : prefix);
     
@@ -2228,6 +2276,22 @@ class ResolvedProvider implements IFSProvider {
         this.fsResolver = resolver;
     }
 
+    /**
+     * File contents by full path, synchronously.
+     * @param fullPath
+     */
+    content(fullPath:string): string {
+        return this.resolver.content(fullPath);
+    }
+
+    /**
+     * File contents by full path, asynchronously.
+     * @param fullPath
+     */
+    contentAsync(fullPath:string):Promise<string> {
+        return this.resolver.contentAsync(fullPath);
+    }
+
     contentDirName(content: IEditorStateProvider): string {
         return this.resolver.dirname(content.getPath());
     }
@@ -2262,6 +2326,108 @@ class ResolvedProvider implements IFSProvider {
 
     readDirAsync(path: string): Promise<string[]> {
         return this.resolver.listAsync(path);
+    }
+}
+
+class ProviderBasedResolver implements FSResolverExt {
+
+    constructor(private provider : IFSProvider){
+
+    }
+
+    /**
+     * File contents by full path, synchronously.
+     * @param fullPath
+     */
+    content(fullPath:string): string {
+        return this.provider.content(fullPath);
+    }
+
+    /**
+     * File contents by full path, asynchronously.
+     * @param fullPath
+     */
+    contentAsync(fullPath:string):Promise<string> {
+        return this.provider.contentAsync(fullPath);
+    }
+
+    /**
+     * Lists directory contents.
+     * @param fullPath
+     */
+    list(fullPath: string): string[] {
+        return this.provider.readDir(fullPath);
+    }
+
+    /**
+     * Checks item existance.
+     * @param fullPath
+     */
+    exists(fullPath: string): boolean {
+        return this.provider.exists(fullPath);
+    }
+
+    /**
+     * Gets directory name by full path.
+     * @param fullPath
+     */
+    dirname(fullPath: string): string {
+        return this.provider.dirName(fullPath);
+    }
+
+    /**
+     * Resolves one path against another.
+     * @param contextPath - path to resolve against.
+     * @param relativePath - relative path to resolve.
+     */
+    resolve(contextPath: string, relativePath: string): string {
+        return this.provider.resolve(contextPath, relativePath);
+    }
+
+    /**
+     * Returns file extension name.
+     * @param fullPath
+     */
+    extname(fullPath: string): string {
+        let lastDotIndex = fullPath.lastIndexOf(".");
+
+        if (lastDotIndex === -1 || lastDotIndex === fullPath.length - 1) {
+            return null;
+        }
+
+        return fullPath.substring(lastDotIndex + 1);
+    }
+
+    /**
+     * Check whether the path points to a directory.
+     * @param fullPath
+     */
+    isDirectory(fullPath: string): boolean {
+        return this.provider.isDirectory(fullPath);
+    }
+
+    /**
+     * Check whether the path points to a directory.
+     * @param fullPath
+     */
+    isDirectoryAsync(path: string): Promise<boolean> {
+        return this.provider.isDirectoryAsync(path);
+    }
+
+    /**
+     * Checks item existance.
+     * @param fullPath
+     */
+    existsAsync(path: string): Promise<boolean> {
+        return this.provider.existsAsync(path);
+    }
+
+    /**
+     * Lists directory contents.
+     * @param fullPath
+     */
+    listAsync(path: string): Promise<string[]> {
+        return this.provider.readDirAsync(path);
     }
 }
 

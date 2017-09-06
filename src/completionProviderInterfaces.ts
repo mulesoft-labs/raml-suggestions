@@ -51,6 +51,18 @@ export interface IASTProvider {
 export interface IFSProvider {
 
     /**
+     * File contents by full path, synchronously.
+     * @param fullPath
+     */
+    content(fullPath:string): string;
+
+    /**
+     * File contents by full path, asynchronously.
+     * @param fullPath
+     */
+    contentAsync(fullPath:string):Promise<string>;
+
+    /**
      * Directory name of the file, opened in the specific editor.
      * @param content
      */

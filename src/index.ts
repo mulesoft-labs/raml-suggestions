@@ -1,5 +1,6 @@
 import completionProvider = require('./completionProvider');
 import completionProviderInterfaces = require('./completionProviderInterfaces');
+import loggerModule = require("./logger")
 
 /**
  * Editor state provider.
@@ -35,6 +36,16 @@ export type FSResolver = completionProviderInterfaces.FSResolver;
  * Extended JS parser FSResolver, being able to provide more FS data.
  */
 export type FSResolverExt = completionProviderInterfaces.FSResolverExt;
+
+/**
+ * Logger.
+ */
+export type ILogger = loggerModule.ILogger
+
+/**
+ * Logger settings.
+ */
+export type ISettings = loggerModule.ILoggerSettings
 
 var _editorStateProvider: IEditorStateProvider = null;
 
@@ -101,4 +112,12 @@ export function suggestAsync(editorState: IEditorStateProvider, fsProvider: IFSP
  */
 export function getContentProvider(resolver: FSResolverExt): IFSProvider {
     return completionProvider.getContentProvider(resolver);
+}
+
+/**
+ * Sets logger for the suggestions.
+ * @param logger
+ */
+export function setLogger(logger: loggerModule.ILogger) : void {
+    completionProvider.setLogger(logger)
 }

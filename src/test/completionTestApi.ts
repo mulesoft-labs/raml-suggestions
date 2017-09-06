@@ -6,6 +6,23 @@ import path = require('path');
 import fs = require('fs');
 
 class SyncContentProvider implements completion.IFSProvider {
+
+    /**
+     * File contents by full path, synchronously.
+     * @param fullPath
+     */
+    content(fullPath:string): string {
+        return fs.readFileSync(fullPath).toString();
+    }
+
+    /**
+     * File contents by full path, asynchronously.
+     * @param fullPath
+     */
+    contentAsync(fullPath:string):Promise<string> {
+        return Promise.reject("method disabled");
+    }
+
     contentDirName(content: completion.IEditorStateProvider): string {
         var contentPath = content.getPath();
         
