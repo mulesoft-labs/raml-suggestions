@@ -12,7 +12,11 @@ class SyncContentProvider implements completion.IFSProvider {
      * @param fullPath
      */
     content(fullPath:string): string {
-        return fs.readFileSync(fullPath).toString();
+        try {
+            return fs.readFileSync(fullPath).toString();
+        } catch (Error) {
+            return null;
+        }
     }
 
     /**
