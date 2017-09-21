@@ -20,6 +20,6 @@ resourceTypes:
       description: Allows to create new <<objectName | !singularize>>
       body:
         application/json:
-          schema: <<objectName | !singularize>>
+          schema: <<objectName>>
 /test:
   type:  { TestResorceType: {objectName : TestSchema} }
