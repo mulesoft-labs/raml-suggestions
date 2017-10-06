@@ -1036,7 +1036,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
 
     if(!known || !custom) {
         if(request.async) {
-            filtredDirContentAsync(dn, typedPath, indexOfDot, contentProvider, request.promises);
+            filtredDirContentAsync(dn, typedPath, indexOfDot, contentProvider, request.promises, request.content.getPath());
         } else if(contentProvider.exists(<string>dn) && contentProvider.isDirectory(<string>dn)) {
             var dirContent = contentProvider.readDir(<string>dn);
 
@@ -1045,6 +1045,10 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
             res = res.concat(dirContent.filter(x => {
                 try {
                     var fullPath = contentProvider.resolve(<string>dn, x);
+                    
+                    if(fullPath === request.content.getPath()) {
+                        return false;
+                    }
 
                     if(fullPath.indexOf(typedPath) === 0) {
                         return true;
@@ -1065,7 +1069,7 @@ function pathPartCompletion(request:CompletionRequest, contentProvider: IFSProvi
     return res;
 }
 
-function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: string, indexOfDot: number, contentProvider: IFSProvider, promises: Promise<any[]>[]): void {
+function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: string, indexOfDot: number, contentProvider: IFSProvider, promises: Promise<any[]>[], excludePath: string): void {
     if(promises) {
         var asString: string;
 
@@ -1089,6 +1093,10 @@ function filtredDirContentAsync(dirName: string | Promise<string>, typedPath: st
                     var res = dirContent.filter(x => {
                         try {
                             var fullPath = contentProvider.resolve(asString, x);
+                            
+                            if(fullPath === excludePath) {
+                                return false;
+                            }
 
                             if(fullPath.indexOf(typedPath) === 0) {
                                 return true;
