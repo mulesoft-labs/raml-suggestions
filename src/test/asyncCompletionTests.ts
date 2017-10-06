@@ -634,6 +634,10 @@ describe("Async completion tests", function() {
     it("test59", function (done) {
         testCompletionByEntryEnd('basic/test59.raml', done, '!include#', '');
     });
+
+    it("test60", function (done) {
+        testCompletionByEntryEnd('basic/test60_overlay.raml', done, 'test60', '');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {

@@ -924,6 +924,10 @@ describe("Basic completion tests", function() {
     it("test59", function () {
         testCompletionByEntryEnd('basic/test59.raml', '!include#', '');
     });
+
+    it("test60", function () {
+        testCompletionByEntryEnd('basic/test60_overlay.raml', 'test60', '');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
