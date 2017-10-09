@@ -1,7 +1,5 @@
-/// <reference path="../../typings/main.d.ts" />
-
 import chai = require("chai");
-import assert = chai.assert;
+const assert = chai.assert;
 
 import testApi = require('./completionTestApi');
 
