@@ -197,7 +197,7 @@ function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider
     var suggestionsPromise = apiPromise.then(api => getSuggestions(request, provider, findAtOffsetInNode(request.content.getOffset(), api.highLevel())));
 
     var requestSuggestionsPromise = suggestionsPromise.then((suggestions: Suggestion[]) => {
-        return Promise.all([suggestions].concat(request.promises));
+        return Promise.all([suggestions].concat(<any[]>request.promises));
     });
 
     var finalPromise = requestSuggestionsPromise.then((arrays: Suggestion[][]) => {
