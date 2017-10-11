@@ -98,26 +98,26 @@ function resolve(testPath: string): string {
     return path.resolve(__dirname, '../../tests/' + testPath);
 }
 
-export function completionByOffset(filePath: string, offset: number): string {
+export function completionByOffset(filePath: string, offset: number): string[] {
 
     var content: completion.IEditorStateProvider = new FSContent(resolve(filePath), offset);
 
     var result = completion.suggest(content, new SyncContentProvider());
 
-    return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
+    return result.map((suggestion: any) => suggestion.displayText || suggestion.text);
 }
 
-export function completionByOffsetAsync(filePath: string, offset: number, callback: (result: string) => void): void {
+export function completionByOffsetAsync(filePath: string, offset: number, callback: (result: string[]) => void): void {
     var content: completion.IEditorStateProvider = new FSContent(resolve(filePath), offset);
 
     var result = completion.suggestAsync(content, new SyncContentProvider());
 
     result.then(result => {
-        callback(result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', '));
+        callback(result.map((suggestion: any) => suggestion.displayText || suggestion.text));
     })
 }
 
-export function completionByUniqueEntry(filePath: string, entry: string, begin: boolean = false): string {
+export function completionByUniqueEntry(filePath: string, entry: string, begin: boolean = false): string[] {
 
 
     var content = new FSContent(resolve(filePath), 0);
@@ -126,17 +126,17 @@ export function completionByUniqueEntry(filePath: string, entry: string, begin: 
 
     var result = completion.suggest(content, new SyncContentProvider());
 
-    return result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', ');
+    return result.map((suggestion: any) => suggestion.displayText || suggestion.text);
 }
 
-export function completionByUniqueEntryAsync(filePath: string, entry: string, begin: boolean = false, callback: (result: string) => void): void {
+export function completionByUniqueEntryAsync(filePath: string, entry: string, begin: boolean = false, callback: (result: string[]) => void): void {
     var content = new FSContent(resolve(filePath), 0);
     var position = begin ? (content.getText().indexOf(entry)) : offsetForEntry(entry, content.getText());
     content.offset = position;
 
     var result = completion.suggestAsync(content, completion.getContentProvider(new AsyncFSResolver()));
     result.then(result => {
-        callback(result.map((suggestion: any) => suggestion.displayText || suggestion.text).join(', '));
+        callback(result.map((suggestion: any) => suggestion.displayText || suggestion.text));
     })
 }
 

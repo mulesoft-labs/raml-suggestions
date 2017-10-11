@@ -641,7 +641,7 @@ describe("Async completion tests", function() {
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {
     testApi.completionByUniqueEntryAsync(testPath, entry, true, result => {
         try {
-            assert.equal(result, expected);
+            assert(result, expected);
 
             done();
         } catch(exception) {
@@ -653,7 +653,7 @@ function testCompletionByEntryStart(testPath: string, done: any, entry: string, 
 function testCompletionByEntryEnd(testPath: string, done: any, entry: string, expected: string) {
     testApi.completionByUniqueEntryAsync(testPath, entry, false, result => {
         try {
-            assert.equal(result, expected);
+            assert(result, expected);
 
             done();
         } catch(exception) {
@@ -665,7 +665,7 @@ function testCompletionByEntryEnd(testPath: string, done: any, entry: string, ex
 function testCompletionByOffset(testPath: string, done: any, offset: number, expected: string) {
     testApi.completionByOffsetAsync(testPath, offset, result => {
         try {
-            assert.equal(result, expected);
+            assert(result, expected);
 
             done();
         } catch(exception) {

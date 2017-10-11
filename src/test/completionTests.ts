@@ -931,17 +931,40 @@ describe("Basic completion tests", function() {
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
     var result = testApi.completionByUniqueEntry(testPath, entry, true);
 
-    assert.equal(result, expected);
+    assert(result, expected);
 }
 
 function testCompletionByEntryEnd(testPath: string, entry: string, expected: string) {
     var result = testApi.completionByUniqueEntry(testPath, entry);
     
-    assert.equal(result, expected);
+    assert(result, expected);
 }
 
 function testCompletionByOffset(testPath: string, offset: number, expected: string) {
     var result = testApi.completionByOffset(testPath, offset);
 
-    assert.equal(result, expected);
+    assert(result, expected);
+}
+
+function compareProposals(actualProposals: string[], expectedStr: string): boolean {
+    const expectedProposals: string[] = expectedStr.length === 0 ? [] : expectedStr.split(", ");
+
+    if (actualProposals.length !== expectedProposals.length) {
+        console.log("Expected " + expectedProposals.length
+            + " proposals, but got " + actualProposals.length);
+
+        console.log("Expected: " + expectedStr + " , actual: " + actualProposals.join(", "));
+        return false;
+    }
+
+    for (const expectedProposal of expectedProposals) {
+        if (actualProposals.indexOf(expectedProposal) == -1) {
+            console.log("Can not find expected proposal " + expectedProposal);
+            console.log("Expected: " + expectedStr + " , actual: " + actualProposals.join(", "));
+
+            return false;
+        }
+    }
+
+    return true;
 }
