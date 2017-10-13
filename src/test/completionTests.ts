@@ -926,6 +926,10 @@ describe("Basic completion tests", function() {
     it("test60", function () {
         testCompletionByEntryEnd('basic/test60_overlay.raml', 'test60', '');
     });
+
+    it("test61", function () {
+        testCompletionByEntryStart('basic/test61.raml', '#marker', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
