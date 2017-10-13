@@ -646,7 +646,7 @@ function getSuggestions(request: CompletionRequest, provider: CompletionProvider
             if (hlnode.property() &&
                 universeHelpers.isResourcesProperty(hlnode.property())) {
                 var nm = hlnode.attr("relativeUri");
-                if (nm && hlnode.name().substring(0, hlnode.name().length - 1) == request.valuePrefix()) {
+                if (nm && hlnode.name().substring(0, hlnode.name().length - 1) == request.valuePrefix() && request.valuePrefix() !== '') {
                     if (nm && nm.value().indexOf("{") != -1) {
                         return [{text: "mediaTypeExtension}"}]
                     }
