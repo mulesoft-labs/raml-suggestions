@@ -204,6 +204,10 @@ function doSuggestAsync(request: CompletionRequest, provider: CompletionProvider
         var result: Suggestion[] = [];
 
         arrays.forEach((suggestions => {
+            if(!suggestions) {
+                return;
+            }
+            
             result = result.concat(suggestions);
         }));
 
