@@ -302,7 +302,7 @@ describe("Basic completion tests", function() {
     });
 
     it("Resource node 'type:'", function () {
-        testCompletionByEntryEnd('basic/test27.raml', '\n  t', 'type');
+        testCompletionByEntryEnd('basic/test27.raml', '\n  t', 'type, trace');
     });
 
     it("Resource nodes 'description, displayName, delete'", function () {
@@ -912,11 +912,11 @@ describe("Basic completion tests", function() {
     });
 
     it("test58_4", function () {
-        testCompletionByEntryStart('basic/test58.raml', '#POINT 4', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 4', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
 
     it("test58_5", function () {
-        testCompletionByEntryStart('basic/test58.raml', '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+        testCompletionByEntryStart('basic/test58.raml', '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
 
     it("test59", function () {
@@ -928,47 +928,30 @@ describe("Basic completion tests", function() {
     });
 
     it("test61", function () {
-        testCompletionByEntryStart('basic/test61.raml', '#marker', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+        testCompletionByEntryStart('basic/test61.raml', '#marker', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
     var result = testApi.completionByUniqueEntry(testPath, entry, true);
 
-    assert(result, expected);
+    assertProposals(result, expected);
 }
 
 function testCompletionByEntryEnd(testPath: string, entry: string, expected: string) {
     var result = testApi.completionByUniqueEntry(testPath, entry);
-    
-    assert(result, expected);
+
+    assertProposals(result, expected);
 }
 
 function testCompletionByOffset(testPath: string, offset: number, expected: string) {
     var result = testApi.completionByOffset(testPath, offset);
 
-    assert(result, expected);
+    assertProposals(result, expected);
 }
 
-function compareProposals(actualProposals: string[], expectedStr: string): boolean {
+function assertProposals(actualProposals: string[], expectedStr: string): void {
     const expectedProposals: string[] = expectedStr.length === 0 ? [] : expectedStr.split(", ");
 
-    if (actualProposals.length !== expectedProposals.length) {
-        console.log("Expected " + expectedProposals.length
-            + " proposals, but got " + actualProposals.length);
-
-        console.log("Expected: " + expectedStr + " , actual: " + actualProposals.join(", "));
-        return false;
-    }
-
-    for (const expectedProposal of expectedProposals) {
-        if (actualProposals.indexOf(expectedProposal) == -1) {
-            console.log("Can not find expected proposal " + expectedProposal);
-            console.log("Expected: " + expectedStr + " , actual: " + actualProposals.join(", "));
-
-            return false;
-        }
-    }
-
-    return true;
+    assert.sameMembers(actualProposals, expectedProposals, "Expected: " + expectedStr + " , actual: " + actualProposals.join(", "));
 }

@@ -300,7 +300,7 @@ describe("Async completion tests", function() {
     });
 
     it("Resource node 'type:'", function (done) {
-        testCompletionByEntryEnd('basic/test27.raml', done, '\n  t', 'type');
+        testCompletionByEntryEnd('basic/test27.raml', done, '\n  t', 'type, trace');
     });
 
     it("Resource nodes 'description, displayName, delete'", function (done) {
@@ -622,11 +622,11 @@ describe("Async completion tests", function() {
     });
 
     it("test58_4", function (done) {
-        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 4', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 4', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
 
     it("test58_5", function (done) {
-        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+        testCompletionByEntryStart('basic/test58.raml', done, '#POINT 5', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
 
     it("test59", function (done) {
@@ -638,14 +638,14 @@ describe("Async completion tests", function() {
     });
 
     it("test61", function (done) {
-        testCompletionByEntryStart('basic/test61.raml', done, '#marker', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch');
+        testCompletionByEntryStart('basic/test61.raml', done, '#marker', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
 });
 
 function testCompletionByEntryStart(testPath: string, done: any, entry: string, expected: string) {
     testApi.completionByUniqueEntryAsync(testPath, entry, true, result => {
         try {
-            assert(result, expected);
+            assertProposals(result, expected);
 
             done();
         } catch(exception) {
@@ -657,7 +657,7 @@ function testCompletionByEntryStart(testPath: string, done: any, entry: string, 
 function testCompletionByEntryEnd(testPath: string, done: any, entry: string, expected: string) {
     testApi.completionByUniqueEntryAsync(testPath, entry, false, result => {
         try {
-            assert(result, expected);
+            assertProposals(result, expected);
 
             done();
         } catch(exception) {
@@ -669,11 +669,17 @@ function testCompletionByEntryEnd(testPath: string, done: any, entry: string, ex
 function testCompletionByOffset(testPath: string, done: any, offset: number, expected: string) {
     testApi.completionByOffsetAsync(testPath, offset, result => {
         try {
-            assert(result, expected);
+            assertProposals(result, expected);
 
             done();
         } catch(exception) {
             done(exception);
         }
     });
+}
+
+function assertProposals(actualProposals: string[], expectedStr: string): void {
+    const expectedProposals: string[] = expectedStr.length === 0 ? [] : expectedStr.split(", ");
+
+    assert.sameMembers(actualProposals, expectedProposals, "Expected: " + expectedStr + " , actual: " + actualProposals.join(", "));
 }
