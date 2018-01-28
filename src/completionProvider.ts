@@ -1544,6 +1544,12 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
         }
         if (p) {
             var vls = enumValues(<def.Property>p,hlnode);
+
+            if(universeHelpers.isIsProperty(p)) {
+                var refs = hlnode.attributes(p.nameId()).map(attr => attr.value());
+                
+                vls = vls.filter(proposal => !_.find(refs, ref => ref === proposal.displayText));
+            }
             
             if ((<def.Property>p).isAllowNull()){
                 vls.push({text:'null',description:'null means - that no value is allowed'})
