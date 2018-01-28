@@ -1526,7 +1526,7 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
 
         var vl=attr.value();
         if(typeof vl ==="object"&&vl) {
-            var innerNode=<parserApi.hl.IHighLevelNode>vl.toHighLevel();
+            var innerNode= <parserApi.hl.IHighLevelNode> ((vl.toHighLevel && vl.toHighLevel()) || (vl.highLevelNode && vl.highLevelNode()));
 
             if (innerNode) {
                 return getSuggestions(provider.currentRequest, provider, findASTNodeByOffset(innerNode, request));
