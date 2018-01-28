@@ -21,19 +21,19 @@ describe("Async completion tests", function() {
     });
 
     it("Built-in types reference completion for a property definition", function (done) {
-        testCompletionByEntryEnd('basic/test3.raml', done, '\n                type: ', 'TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test3.raml', done, '\n                type: ', 'TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("Built-in types reference completion for a property shortcut definition", function (done) {
-        testCompletionByEntryEnd('basic/test4.raml', done, '\n            property: ', 'Define Inline, TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test4.raml', done, '\n            property: ', 'Define Inline, TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("Built-in types reference completion for a type definition", function (done) {
-        testCompletionByEntryEnd('basic/test5.raml', done, '\n      type: ', 'array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test5.raml', done, '\n      type: ', 'array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("Built-in types reference completion for a type shortcut definition", function (done) {
-        testCompletionByEntryEnd('basic/test6.raml', done, '\n    TestType: ', 'Define Inline, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test6.raml', done, '\n    TestType: ', 'Define Inline, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("User-defined types reference completion for a type shortcut definition", function (done) {
