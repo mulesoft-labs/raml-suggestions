@@ -1526,7 +1526,7 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
 
         var vl=attr.value();
         if(typeof vl ==="object"&&vl) {
-            var innerNode=<parserApi.hl.IHighLevelNode>vl.toHighLevel();
+            var innerNode= <parserApi.hl.IHighLevelNode> ((vl.toHighLevel && vl.toHighLevel()) || (vl.highLevelNode && vl.highLevelNode()));
 
             if (innerNode) {
                 return getSuggestions(provider.currentRequest, provider, findASTNodeByOffset(innerNode, request));
@@ -1543,10 +1543,18 @@ export function valueCompletion(node: parserApi.hl.IParseResult, attr: parserApi
 
         }
         if (p) {
+            var vls = enumValues(<def.Property>p,hlnode);
 
-            var vls = enumValues(<def.Property>p,hlnode)
+            if(universeHelpers.isIsProperty(p)) {
+                var refs = hlnode.attributes(p.nameId()).map(attr => attr.value());
+                
+                vls = vls.filter(proposal => !_.find(refs, ref => ref === proposal.displayText));
+            }
+            
             if ((<def.Property>p).isAllowNull()){
                 vls.push({text:'null',description:'null means - that no value is allowed'})
+            } else if(universeHelpers.isTypeProperty(p) && _.find(hlnode.definition().allSuperTypes(), supertype => parserApi.universeHelpers.isTypeDeclarationType(supertype))) {
+                vls.push({text: 'null'});
             }
             if (!vls||vls.length==0){
                 var oftenKeys=(<def.Property>p).getOftenKeys();

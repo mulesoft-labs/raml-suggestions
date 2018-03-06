@@ -21,19 +21,19 @@ describe("Async completion tests", function() {
     });
 
     it("Built-in types reference completion for a property definition", function (done) {
-        testCompletionByEntryEnd('basic/test3.raml', done, '\n                type: ', 'TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test3.raml', done, '\n                type: ', 'TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("Built-in types reference completion for a property shortcut definition", function (done) {
-        testCompletionByEntryEnd('basic/test4.raml', done, '\n            property: ', 'Define Inline, TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test4.raml', done, '\n            property: ', 'Define Inline, TestType, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("Built-in types reference completion for a type definition", function (done) {
-        testCompletionByEntryEnd('basic/test5.raml', done, '\n      type: ', 'array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test5.raml', done, '\n      type: ', 'array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("Built-in types reference completion for a type shortcut definition", function (done) {
-        testCompletionByEntryEnd('basic/test6.raml', done, '\n    TestType: ', 'Define Inline, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file');
+        testCompletionByEntryEnd('basic/test6.raml', done, '\n    TestType: ', 'Define Inline, array, union, object, string, boolean, number, integer, date-only, time-only, datetime-only, datetime, file, null');
     });
 
     it("User-defined types reference completion for a type shortcut definition", function (done) {
@@ -110,11 +110,8 @@ describe("Async completion tests", function() {
         testCompletionByEntryEnd('basic/test12.raml', done, '\n    is: ', 'TestTrait, TraitWithBody');
     });
 
-    // #2613, completion shouldn't contain used traits.
-    it("Traits reference completion without used traits. BUG#2613. FIXME", function (done) {
-        //Correct test
-        //testCompletionByEntryEnd('basic/test12.raml', '\n      is:  [TestTrait, T', 'TraitWithBody');
-        testCompletionByEntryEnd('basic/test12.raml', done, '\n      is:  [TestTrait, T', 'TestTrait, TraitWithBody');
+    it("Traits reference completion without used traits.", function (done) {
+        testCompletionByEntryEnd('basic/test12.raml', done, '\n      is:  [TestTrait, T', 'TraitWithBody');
     });
 
     it("Resource type with parameters reference completion", function (done) {
