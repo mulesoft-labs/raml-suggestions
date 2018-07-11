@@ -927,6 +927,14 @@ describe("Basic completion tests", function() {
     it("test61", function () {
         testCompletionByEntryStart('basic/test61.raml', '#marker', 'is, type, description, securedBy, uriParameters, displayName, get, put, post, delete, options, head, patch, trace, connect');
     });
+
+    it("test62", function () {
+        testCompletionByEntryStart('basic/test62.raml', '#marker', 'version, baseUri, baseUriParameters, uriParameters, protocols, mediaType, schemas, traits, securedBy, securitySchemes, resourceTypes, documentation');
+    });
+
+    it("test63", function () {
+        testCompletionByEntryStart('basic/test63.raml', '#marker', 'uses, schemas, types, traits, resourceTypes, annotationTypes, securitySchemes, description, version, baseUri, baseUriParameters, protocols, mediaType, securedBy, documentation');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {
