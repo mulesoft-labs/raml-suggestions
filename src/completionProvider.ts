@@ -787,7 +787,11 @@ function getAstNode(request: CompletionRequest, contentProvider: IFSProvider, cl
         var lastChild = findLastChild(astNode);
         
         if(lastChild && lastChild.lowLevel() && (lastChild.lowLevel().end() <= offset)) {
-            astNode = lastChild;
+            var nodeOff = positionOffset(text,lastChild.lowLevel().start())
+            var posOff = positionOffset(text,offset)
+            if(nodeOff<=posOff) {
+                astNode = lastChild;
+            }
         }
     }
 
@@ -2452,4 +2456,13 @@ class ProviderBasedResolver implements FSResolverExt {
 
 export function getContentProvider(resolver: FSResolverExt): IFSProvider {
     return new ResolvedProvider(resolver);
+}
+
+function positionOffset(text:string,pos:number):number {
+    let lineStart = text.lastIndexOf('\n',pos)
+    lineStart = Math.max(0,lineStart)
+    let str = text.substring(lineStart,pos)
+    let strTrim = str.trim()
+    let result = str.indexOf(strTrim)
+    return result
 }
