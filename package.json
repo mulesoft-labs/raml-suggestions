@@ -2,6 +2,7 @@
   "name": "raml-suggestions",
   "version": "0.0.49",
   "main": "dist/index.js",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "rimraf dist && tsc",
     "generateBrowserVersion": "node dist/browserVersionGenerator/browserVersionGenerator.js",
