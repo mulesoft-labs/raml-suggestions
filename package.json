@@ -1,6 +1,6 @@
 {
   "name": "raml-suggestions",
-  "version": "0.0.49",
+  "version": "0.0.51",
   "main": "dist/index.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -20,8 +20,8 @@
   },
   "typings": "./dist/index.d.ts",
   "dependencies": {
-    "underscore": "^1.8.3",
-    "raml-1-parser": "1.1.43",
+    "underscore": "1.9.1",
+    "raml-1-parser": "1.1.47",
     "fuzzaldrin-plus": "^0.5.0"
   },
   "devDependencies": {
@@ -34,7 +34,7 @@
     "mocha": "4.0.1",
     "istanbul": "^0.4.2",
     "mkdirp": "^0.5.1",
-    "typescript": "2.5.2",
+    "typescript": "3.0.1",
     "rimraf": "2.6.2",
     "browserify-global-shim": "^1.0.3",
     "dev-env-installer": "0.0.14",
