@@ -935,6 +935,10 @@ describe("Basic completion tests", function() {
     it("test63", function () {
         testCompletionByEntryStart('basic/test63.raml', '#marker', 'uses, schemas, types, traits, resourceTypes, annotationTypes, securitySchemes, description, version, baseUri, baseUriParameters, protocols, mediaType, securedBy, documentation');
     });
+
+    it("test64", function () {
+        testCompletionByEntryEnd('basic/test64.raml', '3\n      comp', 'complexProp2');
+    });
 });
 
 function testCompletionByEntryStart(testPath: string, entry: string, expected: string) {

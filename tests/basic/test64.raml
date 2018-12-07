@@ -1,0 +1,24 @@
+#%RAML 1.0
+title: test
+
+types:
+  Complex2:
+    type: Complex1
+    example:
+      prop1: strval
+      prop2: 1
+
+  Complex1:
+    properties:
+      prop1: string
+      prop2: number
+
+  complex3:
+    properties:
+      complexProp1: Complex1
+      complexProp2: Complex2
+    example:
+      complexProp1:
+        prop1: strval
+        prop2: 3
+      comp
