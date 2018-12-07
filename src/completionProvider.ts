@@ -1348,6 +1348,12 @@ function propertyCompletion(node: parserApi.hl.IHighLevelNode, request: Completi
         existing[x.name()] = true;
     });
 
+    if(hlnode.definition().isUserDefined()) {
+        hlnode.elements().forEach(x=> {
+            existing[x.name()] = true;
+        });
+    }
+    
     props = props.filter(x=>filterPropertyCompletion(hlnode,x, existing))
 
     if (hlnode.definition().isAssignableFrom(parserApi.universes.Universe10.TypeDeclaration.name)){
